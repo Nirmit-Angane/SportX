@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.sportx.controller.QRController"
+      spacing="20" style="-fx-background-color: #0F172A;">
+    
+    <Label text="QR CODE MANAGEMENT" styleClass="page-title"/>
+    
+    <HBox spacing="15">
+        <!-- Controls -->
+        <VBox spacing="15" styleClass="content-panel" prefWidth="350">
+            <Label text="Generate QR" styleClass="panel-title"/>
+            
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Event ID:" prefWidth="60"/>
+                <TextField fx:id="eventIdField" prefWidth="100"/>
+                <Button text="Generate Event QR" onAction="#generateEventQR" styleClass="active-btn"/>
+            </HBox>
+            
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Match ID:" prefWidth="60"/>
+                <TextField fx:id="matchIdField" prefWidth="100"/>
+                <Button text="Generate Match QR" onAction="#generateMatchQR" styleClass="active-btn"/>
+            </HBox>
+            
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Venue ID:" prefWidth="60"/>
+                <TextField fx:id="venueIdField" prefWidth="100"/>
+                <Button text="Generate Venue QR" onAction="#generateVenueQR" styleClass="active-btn"/>
+            </HBox>
+        </VBox>
+        
+        <!-- Preview -->
+        <VBox spacing="15" styleClass="content-panel" HBox.hgrow="ALWAYS" alignment="CENTER">
+            <Label text="QR Preview" styleClass="panel-title"/>
+            <StackPane style="-fx-background-color: white; -fx-padding: 10;">
+                <ImageView fx:id="qrImageView" fitWidth="250" fitHeight="250" preserveRatio="true"/>
+            </StackPane>
+            <Label fx:id="qrUrlLabel" text="No QR Generated" style="-fx-text-fill: #94A3B8;"/>
+            <Button text="Save QR as PNG" onAction="#saveQR" styleClass="active-btn"/>
+        </VBox>
+    </HBox>
+
+</VBox>

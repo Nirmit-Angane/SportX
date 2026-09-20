@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      spacing="20">
+    
+    <Label text="Dashboard Overview" styleClass="page-title"/>
+    
+    <!-- Dashboard Cards -->
+    <HBox spacing="20">
+        <VBox styleClass="dashboard-card" HBox.hgrow="ALWAYS">
+            <Label text="TOTAL EVENTS" styleClass="card-title"/>
+            <Label text="3" styleClass="card-value"/>
+        </VBox>
+        <VBox styleClass="dashboard-card" HBox.hgrow="ALWAYS">
+            <Label text="ACTIVE EVENTS" styleClass="card-title"/>
+            <Label text="1" styleClass="card-value, text-blue"/>
+        </VBox>
+        <VBox styleClass="dashboard-card" HBox.hgrow="ALWAYS">
+            <Label text="UPCOMING MATCHES" styleClass="card-title"/>
+            <Label text="5" styleClass="card-value"/>
+        </VBox>
+        <VBox styleClass="dashboard-card" HBox.hgrow="ALWAYS">
+            <Label text="LIVE MATCHES" styleClass="card-title"/>
+            <Label text="1" styleClass="card-value, text-red"/>
+        </VBox>
+    </HBox>
+    
+    <!-- Main Sections -->
+    <HBox spacing="20" VBox.vgrow="ALWAYS">
+        <!-- Live Matches -->
+        <VBox styleClass="content-panel" HBox.hgrow="ALWAYS" prefWidth="500">
+            <Label text="LIVE MATCHES" styleClass="panel-title"/>
+            <ListView fx:id="liveMatchesList" VBox.vgrow="ALWAYS" styleClass="custom-list">
+                <!-- Example Item -->
+                <Label text="VIVA Warriors 2 - 1 Mumbai Titans [67:23]" />
+            </ListView>
+        </VBox>
+        
+        <!-- Upcoming Matches -->
+        <VBox styleClass="content-panel" HBox.hgrow="ALWAYS" prefWidth="500">
+            <Label text="UPCOMING MATCHES" styleClass="panel-title"/>
+            <ListView fx:id="upcomingMatchesList" VBox.vgrow="ALWAYS" styleClass="custom-list">
+                <!-- Example Item -->
+                <Label text="Pune Strikers vs Bengaluru FC [Tomorrow, 16:00]" />
+            </ListView>
+        </VBox>
+    </HBox>
+
+</VBox>

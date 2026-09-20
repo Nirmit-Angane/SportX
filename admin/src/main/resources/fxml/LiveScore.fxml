@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.sportx.controller.LiveScoreController"
+      spacing="20" alignment="CENTER"
+      style="-fx-background-color: #0F172A;">
+    
+    <Label text="LIVE SCORE CONTROL CENTER" styleClass="page-title, text-red" />
+    
+    <!-- Match Selector (Simple ID input for now) -->
+    <HBox spacing="10" alignment="CENTER">
+        <Label text="Match ID:" />
+        <TextField fx:id="matchIdField" promptText="Enter Live Match ID (e.g. 10)" />
+        <Button text="Load Match" onAction="#loadMatch" styleClass="active-btn"/>
+    </HBox>
+
+    <VBox spacing="30" alignment="CENTER" styleClass="content-panel" maxWidth="600">
+        <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+        
+        <!-- Score Board -->
+        <HBox spacing="50" alignment="CENTER">
+            <!-- Home Team -->
+            <VBox spacing="10" alignment="CENTER">
+                <Label fx:id="homeTeamName" text="HOME TEAM" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Label fx:id="homeScoreLabel" text="0" style="-fx-font-size: 72px; -fx-font-weight: bold;"/>
+                <HBox spacing="10">
+                    <Button text="-" onAction="#homeMinus" styleClass="sidebar-btn" style="-fx-border-color: #334155;"/>
+                    <Button text="+" onAction="#homePlus" styleClass="sidebar-btn" style="-fx-border-color: #334155;"/>
+                </HBox>
+            </VBox>
+            
+            <Label text="VS" style="-fx-font-size: 24px; -fx-text-fill: #94A3B8;"/>
+            
+            <!-- Away Team -->
+            <VBox spacing="10" alignment="CENTER">
+                <Label fx:id="awayTeamName" text="AWAY TEAM" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Label fx:id="awayScoreLabel" text="0" style="-fx-font-size: 72px; -fx-font-weight: bold;"/>
+                <HBox spacing="10">
+                    <Button text="-" onAction="#awayMinus" styleClass="sidebar-btn" style="-fx-border-color: #334155;"/>
+                    <Button text="+" onAction="#awayPlus" styleClass="sidebar-btn" style="-fx-border-color: #334155;"/>
+                </HBox>
+            </VBox>
+        </HBox>
+        
+        <!-- Timer -->
+        <Label fx:id="timerLabel" text="00:00" style="-fx-font-size: 48px; -fx-text-fill: #38BDF8;"/>
+        
+        <!-- Controls -->
+        <HBox spacing="20" alignment="CENTER">
+            <Button text="UPDATE SCORE" onAction="#updateScore" styleClass="active-btn" prefWidth="150" prefHeight="40"/>
+            <Button text="END MATCH" onAction="#endMatch" styleClass="active-btn" style="-fx-background-color: #EF4444;" prefWidth="150" prefHeight="40"/>
+        </HBox>
+    </VBox>
+
+</VBox>

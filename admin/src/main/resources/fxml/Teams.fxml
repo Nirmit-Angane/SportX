@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      spacing="15" style="-fx-background-color: #0F172A;" alignment="CENTER">
+    
+    <Label text="Placeholder View" styleClass="page-title"/>
+    <Label text="This view is under development." style="-fx-text-fill: #94A3B8;"/>
+    
+</VBox>

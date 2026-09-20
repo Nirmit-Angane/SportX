@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Live Score - SportX</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="../index.html" class="brand">SPORTX</a>
+    </nav>
+
+    <div class="container">
+        <div class="score-board">
+            <div class="live-indicator" id="status-indicator">● LIVE</div>
+            <div style="margin-top: 1rem; color: var(--text-muted);" id="match-details">
+                FOOTBALL • SEMIFINAL
+            </div>
+
+            <div class="teams-container">
+                <div class="team-name" id="home-team" style="text-align: right;">Loading...</div>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="score" id="home-score">-</div>
+                    <div class="vs">-</div>
+                    <div class="score" id="away-score">-</div>
+                </div>
+                <div class="team-name" id="away-team" style="text-align: left;">Loading...</div>
+            </div>
+
+            <div class="timer" id="timer">00:00</div>
+            
+            <div style="margin-top: 2rem; color: var(--text-muted);" id="venue-details">
+                VENUE: Loading...
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/live-score.js"></script>
+</body>
+</html>

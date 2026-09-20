@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.sportx.controller.MainController"
+            prefHeight="800.0" prefWidth="1200.0">
+            
+    <!-- Sidebar -->
+    <left>
+        <VBox styleClass="sidebar" prefWidth="250.0" spacing="10">
+            <padding>
+                <Insets top="20" right="10" bottom="20" left="10"/>
+            </padding>
+            <Label text="SPORTX" styleClass="sidebar-title"/>
+            
+            <Button text="Dashboard" onAction="#showDashboard" styleClass="sidebar-btn, active-btn" maxWidth="Infinity"/>
+            <Button text="Events" onAction="#showEvents" styleClass="sidebar-btn" maxWidth="Infinity"/>
+            <Button text="Teams" onAction="#showTeams" styleClass="sidebar-btn" maxWidth="Infinity"/>
+            <Button text="Players" onAction="#showPlayers" styleClass="sidebar-btn" maxWidth="Infinity"/>
+            <Button text="Venues" onAction="#showVenues" styleClass="sidebar-btn" maxWidth="Infinity"/>
+            <Button text="Matches" onAction="#showMatches" styleClass="sidebar-btn" maxWidth="Infinity"/>
+            <Button text="Live Score" onAction="#showLiveScore" styleClass="sidebar-btn" maxWidth="Infinity"/>
+            <Button text="QR Codes" onAction="#showQRCodes" styleClass="sidebar-btn" maxWidth="Infinity"/>
+            <Button text="Settings" styleClass="sidebar-btn" maxWidth="Infinity"/>
+            
+            <Region VBox.vgrow="ALWAYS" />
+            
+            <!-- Connection Status -->
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="status-indicator">
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
+                <Label text="●" styleClass="status-dot, status-connected"/>
+                <Label text="Server Connected" styleClass="status-text"/>
+            </HBox>
+        </VBox>
+    </left>
+    
+    <!-- Top Bar & Main Content Area -->
+    <center>
+        <VBox>
+            <!-- Top Bar -->
+            <HBox styleClass="top-bar" alignment="CENTER_RIGHT" prefHeight="60.0">
+                <padding>
+                    <Insets right="20" left="20"/>
+                </padding>
+                <Label text="Admin Dashboard" styleClass="top-bar-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Admin User" styleClass="admin-user-label"/>
+            </HBox>
+            
+            <!-- Main Content Area where different views will be loaded. For now, we embed Dashboard content directly. -->
+            <StackPane fx:id="contentArea" VBox.vgrow="ALWAYS" styleClass="main-content">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+                <!-- Include Dashboard view content -->
+                <fx:include source="Dashboard.fxml"/>
+            </StackPane>
+        </VBox>
+    </center>
+
+</BorderPane>

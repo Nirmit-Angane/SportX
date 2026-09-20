@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SportX - Live Sports Platform</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="brand">SPORTX</a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="pages/events.html">Events</a>
+            <a href="pages/matches.html">Matches</a>
+            <a href="pages/teams.html">Teams</a>
+            <a href="pages/standings.html">Standings</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero" style="text-align: center; padding: 4rem 0;">
+            <h1 style="font-size: 3rem; margin-bottom: 1rem;"><span class="text-blue">LIVE SPORTS.</span> ONE PLATFORM.</h1>
+            <p class="text-muted" style="font-size: 1.2rem; margin-bottom: 2rem;">Experience real-time scores, standings, and match updates instantly.</p>
+            <a href="#live-matches" class="btn">VIEW LIVE SCORES</a>
+        </div>
+
+        <h2 id="live-matches">Live Matches</h2>
+        <div id="matches-container">
+            <!-- Matches injected by JS -->
+            <div class="card">
+                <div class="live-indicator">● LIVE</div>
+                <div class="teams-container" style="margin: 1rem 0;">
+                    <div class="team-name" style="text-align: right;">VIVA Warriors</div>
+                    <div class="score">2 - 1</div>
+                    <div class="team-name" style="text-align: left;">Mumbai Titans</div>
+                </div>
+                <div style="text-align: center;">
+                    <a href="pages/match.html?id=10" class="btn">View Match</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

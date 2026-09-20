@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.sportx.controller.EventController"
+      spacing="15" style="-fx-background-color: #0F172A;">
+    
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Label text="Events Management" styleClass="page-title"/>
+        <Region HBox.hgrow="ALWAYS" />
+        <Button text="Refresh" onAction="#loadEvents" styleClass="active-btn"/>
+        <Button text="+ Create Event" styleClass="active-btn"/>
+    </HBox>
+    
+    <TableView fx:id="eventsTable" VBox.vgrow="ALWAYS" style="-fx-base: #1E293B;">
+        <columns>
+            <TableColumn fx:id="idCol" text="ID" prefWidth="50" />
+            <TableColumn fx:id="nameCol" text="Event Name" prefWidth="300" />
+            <TableColumn fx:id="statusCol" text="Status" prefWidth="150" />
+        </columns>
+    </TableView>
+
+</VBox>

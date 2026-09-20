@@ -1,0 +1,147 @@
+/* SportX Admin CSS */
+.root {
+    -fx-background-color: #121826;
+    -fx-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    -fx-text-fill: #E2E8F0;
+}
+
+.label {
+    -fx-text-fill: #E2E8F0;
+}
+
+/* Sidebar */
+.sidebar {
+    -fx-background-color: #1E293B;
+    -fx-border-color: transparent #334155 transparent transparent;
+    -fx-border-width: 1px;
+}
+
+.sidebar-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #38BDF8;
+    -fx-padding: 0 0 20 0;
+}
+
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #94A3B8;
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 15 10 15;
+    -fx-cursor: hand;
+}
+
+.sidebar-btn:hover {
+    -fx-background-color: #334155;
+    -fx-text-fill: #F8FAFC;
+}
+
+.active-btn {
+    -fx-background-color: #38BDF8;
+    -fx-text-fill: #0F172A;
+    -fx-font-weight: bold;
+}
+
+.active-btn:hover {
+    -fx-background-color: #0284C7;
+    -fx-text-fill: #FFFFFF;
+}
+
+.status-indicator {
+    -fx-background-color: #0F172A;
+    -fx-background-radius: 5px;
+}
+
+.status-dot {
+    -fx-font-size: 16px;
+}
+
+.status-connected {
+    -fx-text-fill: #22C55E;
+}
+
+.status-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: #94A3B8;
+}
+
+/* Top Bar */
+.top-bar {
+    -fx-background-color: #1E293B;
+    -fx-border-color: transparent transparent #334155 transparent;
+    -fx-border-width: 1px;
+}
+
+.top-bar-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.admin-user-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #94A3B8;
+}
+
+/* Main Content */
+.main-content {
+    -fx-background-color: #0F172A;
+}
+
+.page-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    -fx-background-color: #1E293B;
+    -fx-background-radius: 8px;
+    -fx-padding: 20;
+    -fx-border-color: #334155;
+    -fx-border-radius: 8px;
+}
+
+.card-title {
+    -fx-font-size: 12px;
+    -fx-text-fill: #94A3B8;
+}
+
+.card-value {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 0 0 0;
+}
+
+.text-blue { -fx-text-fill: #38BDF8; }
+.text-red { -fx-text-fill: #EF4444; }
+
+/* Panels */
+.content-panel {
+    -fx-background-color: #1E293B;
+    -fx-background-radius: 8px;
+    -fx-padding: 15;
+    -fx-border-color: #334155;
+    -fx-border-radius: 8px;
+}
+
+.panel-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #94A3B8;
+    -fx-padding: 0 0 10 0;
+}
+
+.custom-list {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: transparent;
+    -fx-control-inner-background-alt: transparent;
+}
+.custom-list .list-cell {
+    -fx-text-fill: #E2E8F0;
+    -fx-padding: 10;
+    -fx-border-color: transparent transparent #334155 transparent;
+}
+.custom-list .list-cell:empty {
+    -fx-border-color: transparent;
+}
