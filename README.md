@@ -10,11 +10,11 @@ The system is designed with a **Central Source of Truth** architecture to suppor
 
 ```mermaid
 graph TD
-    A[Admin PC 1 (JavaFX)] -->|REST API| C(Central Node.js API)
-    B[Admin PC 2 (JavaFX)] -->|REST API| C
-    C <-->|Read/Write| D[(Central PostgreSQL DB)]
-    E[Public Web App] -->|REST API Polling| C
-    F[Mobile Phones via QR] -->|HTTP| E
+    A["Admin PC 1 (JavaFX)"] -->|REST API| C("Central Node.js API")
+    B["Admin PC 2 (JavaFX)"] -->|REST API| C
+    C <-->|Read/Write| D[("Central PostgreSQL DB")]
+    E["Public Web App"] -->|REST API Polling| C
+    F["Mobile Phones via QR"] -->|HTTP| E
 ```
 
 ### Components
