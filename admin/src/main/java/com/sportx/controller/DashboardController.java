@@ -2,7 +2,6 @@ package com.sportx.controller;
 
 import com.sportx.api.ApiClient;
 import com.sportx.util.AppUtil;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

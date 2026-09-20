@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.IOException;
 
@@ -16,8 +17,12 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
         scene = new Scene(loadFXML("Main"), 1200, 800);
         scene.getStylesheets().add(getClass().getResource("/css/sportx.css").toExternalForm());
+        
+        stage.initStyle(StageStyle.UNDECORATED);
         stage.setScene(scene);
         stage.setTitle("SportX Admin Control Center");
+        stage.setMaximized(true);
+        
         stage.show();
     }
 

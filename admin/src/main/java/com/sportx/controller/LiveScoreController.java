@@ -9,16 +9,20 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.ComboBox;
 
 public class LiveScoreController {
 
-    @FXML private TextField matchIdField;
+    @FXML private ComboBox<MatchItem> matchSelector;
     @FXML private VBox liveConsole;
     
     @FXML private Label matchStatusLabel;
@@ -40,22 +44,59 @@ public class LiveScoreController {
     private int secondsElapsed = 0;
     private boolean isTimerRunning = false;
 
+    private static class MatchItem {
+        int id;
+        String label;
+        MatchItem(int id, String label) { this.id = id; this.label = label; }
+        @Override public String toString() { return label; }
+    }
+
     @FXML
     public void initialize() {
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> updateTimerDisplay()));
         timeline.setCycleCount(Animation.INDEFINITE);
+        
+        // When this view becomes visible or active, we should load matches.
+        // For simplicity, we just trigger it immediately.
+        refreshMatches();
+    }
+
+    public void refreshMatches() {
+        AppUtil.runAsync(() -> ApiClient.getAsync("/matches").join(),
+            res -> {
+                try {
+                    JSONObject json = new JSONObject(res);
+                    if (json.getBoolean("success")) {
+                        JSONArray data = json.getJSONArray("data");
+                        ObservableList<MatchItem> items = FXCollections.observableArrayList();
+                        for (int i = 0; i < data.length(); i++) {
+                            JSONObject obj = data.getJSONObject(i);
+                            String status = obj.optString("status", "");
+                            if ("LIVE".equals(status) || "UPCOMING".equals(status)) {
+                                int id = obj.getInt("id");
+                                String home = obj.optString("home_team_name", "Team " + obj.getInt("home_team_id"));
+                                String away = obj.optString("away_team_name", "Team " + obj.getInt("away_team_id"));
+                                items.add(new MatchItem(id, id + ": " + home + " vs " + away + " (" + status + ")"));
+                            }
+                        }
+                        matchSelector.setItems(items);
+                    }
+                } catch (Exception e) {}
+            },
+            err -> {}
+        );
     }
 
     @FXML
     public void loadMatch() {
-        String idStr = matchIdField.getText().trim();
-        if (idStr.isEmpty()) {
-            AppUtil.showAlert(Alert.AlertType.WARNING, "Warning", "Please enter a Match ID.");
+        MatchItem selected = matchSelector.getValue();
+        if (selected == null) {
+            AppUtil.showAlert(Alert.AlertType.WARNING, "Warning", "Please select a match.");
             return;
         }
 
         try {
-            int matchId = Integer.parseInt(idStr);
+            int matchId = selected.id;
             MainController.getInstance().showLoading("Loading Match...");
             
             AppUtil.runAsync(() -> ApiClient.getAsync("/matches/" + matchId).join(), 
@@ -106,8 +147,8 @@ public class LiveScoreController {
                     AppUtil.showAlert(Alert.AlertType.ERROR, "Network Error", "Failed to fetch match: " + error.getMessage());
                 });
 
-        } catch (NumberFormatException e) {
-            AppUtil.showAlert(Alert.AlertType.WARNING, "Warning", "Match ID must be a number.");
+        } catch (Exception e) {
+            AppUtil.showAlert(Alert.AlertType.WARNING, "Warning", "Failed to parse selection.");
         }
     }
 

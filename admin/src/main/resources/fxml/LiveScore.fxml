@@ -16,7 +16,7 @@
     <HBox alignment="CENTER_LEFT" spacing="15">
         <Label text="LIVE MATCH CONTROL" styleClass="page-title"/>
         <Region HBox.hgrow="ALWAYS" />
-        <TextField fx:id="matchIdField" promptText="Enter Match ID" prefWidth="150"/>
+        <ComboBox fx:id="matchSelector" promptText="Select Match" prefWidth="300"/>
         <Button text="LOAD MATCH" onAction="#loadMatch" styleClass="button, btn-primary"/>
     </HBox>
 

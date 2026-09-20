@@ -41,25 +41,25 @@
             <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
             <Label fx:id="formTitle" text="CREATE MATCH" styleClass="panel-title" style="-fx-font-size: 18px; -fx-text-fill: -fx-primary-blue;"/>
             
-            <HBox spacing="20">
+            <HBox spacing="15">
                 <VBox spacing="5" HBox.hgrow="ALWAYS">
-                    <Label text="Event ID"/>
-                    <TextField fx:id="eventIdInput" promptText="e.g. 1"/>
+                    <Label text="Event"/>
+                    <ComboBox fx:id="eventInput" promptText="Select Event" maxWidth="Infinity"/>
                 </VBox>
                 <VBox spacing="5" HBox.hgrow="ALWAYS">
-                    <Label text="Venue ID"/>
-                    <TextField fx:id="venueIdInput" promptText="e.g. 2"/>
+                    <Label text="Venue"/>
+                    <ComboBox fx:id="venueInput" promptText="Select Venue" maxWidth="Infinity"/>
                 </VBox>
             </HBox>
 
-            <HBox spacing="20">
+            <HBox spacing="15">
                 <VBox spacing="5" HBox.hgrow="ALWAYS">
-                    <Label text="Home Team ID"/>
-                    <TextField fx:id="homeTeamInput" promptText="e.g. 5"/>
+                    <Label text="Home Team"/>
+                    <ComboBox fx:id="homeTeamInput" promptText="Select Home Team" maxWidth="Infinity"/>
                 </VBox>
                 <VBox spacing="5" HBox.hgrow="ALWAYS">
-                    <Label text="Away Team ID"/>
-                    <TextField fx:id="awayTeamInput" promptText="e.g. 8"/>
+                    <Label text="Away Team"/>
+                    <ComboBox fx:id="awayTeamInput" promptText="Select Away Team" maxWidth="Infinity"/>
                 </VBox>
             </HBox>
             

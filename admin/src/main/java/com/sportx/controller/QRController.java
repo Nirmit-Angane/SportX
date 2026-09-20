@@ -170,7 +170,7 @@ public class QRController {
             
             AppUtil.runAsync(() -> {
                 try {
-                    BufferedImage bi = ImageIO.read(new URL(qrApiUrl));
+                    BufferedImage bi = ImageIO.read(java.net.URI.create(qrApiUrl).toURL());
                     ImageIO.write(bi, "png", file);
                     return file.getAbsolutePath();
                 } catch (Exception e) {

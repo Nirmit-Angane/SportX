@@ -7,8 +7,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import java.io.IOException;
 
 public class MainController {
@@ -28,8 +30,16 @@ public class MainController {
     @FXML private Button btnMatches;
     @FXML private Button btnLiveScore;
     @FXML private Button btnQRCodes;
+    
+    @FXML private HBox topBar;
+    @FXML private Button btnMinimizeWindow;
+    @FXML private Button btnMaximizeWindow;
+    @FXML private Button btnCloseWindow;
 
     private Button currentActiveButton;
+    
+    private double xOffset = 0;
+    private double yOffset = 0;
 
     public MainController() {
         instance = this;
@@ -42,6 +52,55 @@ public class MainController {
     @FXML
     public void initialize() {
         showDashboard();
+        setupWindowControls();
+    }
+    
+    private void setupWindowControls() {
+        if (topBar != null) {
+            topBar.setOnMousePressed(event -> {
+                Stage stage = (Stage) topBar.getScene().getWindow();
+                if (!stage.isMaximized()) {
+                    xOffset = event.getSceneX();
+                    yOffset = event.getSceneY();
+                }
+            });
+            topBar.setOnMouseDragged(event -> {
+                Stage stage = (Stage) topBar.getScene().getWindow();
+                if (!stage.isMaximized()) {
+                    stage.setX(event.getScreenX() - xOffset);
+                    stage.setY(event.getScreenY() - yOffset);
+                }
+            });
+            topBar.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2) {
+                    maximizeWindow();
+                }
+            });
+        }
+    }
+
+    @FXML
+    private void minimizeWindow() {
+        Stage stage = (Stage) contentArea.getScene().getWindow();
+        stage.setIconified(true);
+    }
+
+    @FXML
+    private void maximizeWindow() {
+        Stage stage = (Stage) contentArea.getScene().getWindow();
+        if (stage.isMaximized()) {
+            stage.setMaximized(false);
+            btnMaximizeWindow.setText("□");
+        } else {
+            stage.setMaximized(true);
+            btnMaximizeWindow.setText("❐");
+        }
+    }
+
+    @FXML
+    private void closeWindow() {
+        Platform.exit();
+        System.exit(0);
     }
 
     @FXML public void showDashboard() { loadView("Dashboard", "Operations Overview", btnDashboard); }

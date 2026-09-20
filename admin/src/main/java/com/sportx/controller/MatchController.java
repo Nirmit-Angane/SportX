@@ -31,13 +31,20 @@ public class MatchController {
     // Form
     @FXML private VBox formOverlay;
     @FXML private Label formTitle;
-    @FXML private TextField eventIdInput;
-    @FXML private TextField venueIdInput;
-    @FXML private TextField homeTeamInput;
-    @FXML private TextField awayTeamInput;
+    @FXML private ComboBox<EntityItem> eventInput;
+    @FXML private ComboBox<EntityItem> venueInput;
+    @FXML private ComboBox<EntityItem> homeTeamInput;
+    @FXML private ComboBox<EntityItem> awayTeamInput;
     @FXML private ComboBox<String> statusInput;
 
     private Integer editingMatchId = null;
+
+    private static class EntityItem {
+        int id;
+        String name;
+        EntityItem(int id, String name) { this.id = id; this.name = name; }
+        @Override public String toString() { return name; }
+    }
 
     @FXML
     public void initialize() {
@@ -97,51 +104,93 @@ public class MatchController {
 
     @FXML
     public void loadMatches() {
-        MainController.getInstance().showLoading("Loading Matches...");
-        AppUtil.runAsync(() -> ApiClient.getAsync("/matches").join(), 
+        MainController.getInstance().showLoading("Loading Matches and Dependencies...");
+        AppUtil.runAsync(() -> {
+            String eventsJson = ApiClient.getAsync("/events").join();
+            String venuesJson = ApiClient.getAsync("/venues").join();
+            String teamsJson = ApiClient.getAsync("/teams").join();
+            String matchesJson = ApiClient.getAsync("/matches").join();
+            
+            return new JSONObject()
+                .put("events", new JSONObject(eventsJson))
+                .put("venues", new JSONObject(venuesJson))
+                .put("teams", new JSONObject(teamsJson))
+                .put("matches", new JSONObject(matchesJson));
+        }, 
         response -> {
             MainController.getInstance().hideLoading();
-            try {
-                JSONObject json = new JSONObject(response);
-                if (json.getBoolean("success")) {
-                    JSONArray data = json.getJSONArray("data");
-                    ObservableList<Match> list = FXCollections.observableArrayList();
-                    for (int i = 0; i < data.length(); i++) {
-                        JSONObject obj = data.getJSONObject(i);
-                        Match m = new Match(
-                            obj.getInt("id"),
-                            obj.getInt("event_id"),
-                            obj.optInt("venue_id", 0),
-                            obj.getInt("home_team_id"),
-                            obj.getInt("away_team_id"),
-                            obj.optString("status", "UPCOMING")
-                        );
-                        m.setHomeTeamName(obj.optString("home_team_name", null));
-                        m.setAwayTeamName(obj.optString("away_team_name", null));
-                        m.setHomeScore(obj.optInt("home_score", 0));
-                        m.setAwayScore(obj.optInt("away_score", 0));
-                        list.add(m);
-                    }
-                    matchesTable.setItems(list);
-                }
-            } catch (Exception e) {
-                AppUtil.showAlert(Alert.AlertType.ERROR, "Parse Error", "Failed to parse matches data.");
-            }
+            processDropdownData(response);
+            processMatchesData(response.getJSONObject("matches"));
         }, 
         error -> {
             MainController.getInstance().hideLoading();
-            AppUtil.showAlert(Alert.AlertType.ERROR, "Network Error", "Failed to fetch matches.");
+            AppUtil.showAlert(Alert.AlertType.ERROR, "Network Error", "Failed to fetch match data.");
         });
+    }
+
+    private void processDropdownData(JSONObject response) {
+        try {
+            ObservableList<EntityItem> events = extractEntityItems(response.getJSONObject("events"), "name");
+            ObservableList<EntityItem> venues = extractEntityItems(response.getJSONObject("venues"), "name");
+            ObservableList<EntityItem> teams = extractEntityItems(response.getJSONObject("teams"), "name");
+
+            eventInput.setItems(events);
+            venueInput.setItems(venues);
+            homeTeamInput.setItems(teams);
+            awayTeamInput.setItems(teams);
+        } catch (Exception e) {
+            System.err.println("Failed to process dropdown data: " + e.getMessage());
+        }
+    }
+
+    private ObservableList<EntityItem> extractEntityItems(JSONObject json, String nameKey) {
+        ObservableList<EntityItem> items = FXCollections.observableArrayList();
+        if (json.getBoolean("success")) {
+            JSONArray data = json.getJSONArray("data");
+            for (int i = 0; i < data.length(); i++) {
+                JSONObject obj = data.getJSONObject(i);
+                items.add(new EntityItem(obj.getInt("id"), obj.getString(nameKey)));
+            }
+        }
+        return items;
+    }
+
+    private void processMatchesData(JSONObject json) {
+        try {
+            if (json.getBoolean("success")) {
+                JSONArray data = json.getJSONArray("data");
+                ObservableList<Match> list = FXCollections.observableArrayList();
+                for (int i = 0; i < data.length(); i++) {
+                    JSONObject obj = data.getJSONObject(i);
+                    Match m = new Match(
+                        obj.getInt("id"),
+                        obj.getInt("event_id"),
+                        obj.isNull("venue_id") ? null : obj.getInt("venue_id"),
+                        obj.getInt("home_team_id"),
+                        obj.getInt("away_team_id"),
+                        obj.optString("status", "UPCOMING")
+                    );
+                    m.setHomeTeamName(obj.optString("home_team_name", null));
+                    m.setAwayTeamName(obj.optString("away_team_name", null));
+                    m.setHomeScore(obj.optInt("home_score", 0));
+                    m.setAwayScore(obj.optInt("away_score", 0));
+                    list.add(m);
+                }
+                matchesTable.setItems(list);
+            }
+        } catch (Exception e) {
+            AppUtil.showAlert(Alert.AlertType.ERROR, "Parse Error", "Failed to parse matches data.");
+        }
     }
 
     @FXML
     public void showCreateForm() {
         editingMatchId = null;
         formTitle.setText("CREATE MATCH");
-        eventIdInput.clear();
-        venueIdInput.clear();
-        homeTeamInput.clear();
-        awayTeamInput.clear();
+        eventInput.getSelectionModel().clearSelection();
+        venueInput.getSelectionModel().clearSelection();
+        homeTeamInput.getSelectionModel().clearSelection();
+        awayTeamInput.getSelectionModel().clearSelection();
         statusInput.getSelectionModel().select("UPCOMING");
         formOverlay.setVisible(true);
     }
@@ -149,12 +198,27 @@ public class MatchController {
     private void showEditForm(Match match) {
         editingMatchId = match.getId();
         formTitle.setText("EDIT MATCH - #" + match.getId());
-        eventIdInput.setText(String.valueOf(match.getEventId()));
-        venueIdInput.setText(String.valueOf(match.getVenueId()));
-        homeTeamInput.setText(String.valueOf(match.getHomeTeamId()));
-        awayTeamInput.setText(String.valueOf(match.getAwayTeamId()));
+        
+        selectEntity(eventInput, match.getEventId());
+        selectEntity(venueInput, match.getVenueId());
+        selectEntity(homeTeamInput, match.getHomeTeamId());
+        selectEntity(awayTeamInput, match.getAwayTeamId());
+        
         statusInput.getSelectionModel().select(match.getStatus());
         formOverlay.setVisible(true);
+    }
+
+    private void selectEntity(ComboBox<EntityItem> combo, Integer id) {
+        if (id == null) {
+            combo.getSelectionModel().clearSelection();
+            return;
+        }
+        for (EntityItem item : combo.getItems()) {
+            if (item.id == id) {
+                combo.getSelectionModel().select(item);
+                return;
+            }
+        }
     }
 
     @FXML
@@ -164,47 +228,53 @@ public class MatchController {
 
     @FXML
     public void saveMatch() {
-        try {
-            int eventId = Integer.parseInt(eventIdInput.getText().trim());
-            int venueId = Integer.parseInt(venueIdInput.getText().trim());
-            int homeTeam = Integer.parseInt(homeTeamInput.getText().trim());
-            int awayTeam = Integer.parseInt(awayTeamInput.getText().trim());
-            String status = statusInput.getValue();
+        if (eventInput.getValue() == null || homeTeamInput.getValue() == null || awayTeamInput.getValue() == null) {
+            AppUtil.showAlert(Alert.AlertType.WARNING, "Validation Error", "Event and Teams are required.");
+            return;
+        }
+        
+        int eventId = eventInput.getValue().id;
+        Integer venueId = venueInput.getValue() != null ? venueInput.getValue().id : null;
+        int homeTeam = homeTeamInput.getValue().id;
+        int awayTeam = awayTeamInput.getValue().id;
+        String status = statusInput.getValue();
 
-            JSONObject payload = new JSONObject();
-            payload.put("event_id", eventId);
-            payload.put("venue_id", venueId);
-            payload.put("home_team_id", homeTeam);
-            payload.put("away_team_id", awayTeam);
-            payload.put("status", status);
+        if (homeTeam == awayTeam) {
+            AppUtil.showAlert(Alert.AlertType.WARNING, "Validation Error", "Home and Away teams must be different.");
+            return;
+        }
 
-            MainController.getInstance().showLoading("Saving Match...");
-            
-            if (editingMatchId == null) {
-                AppUtil.runAsync(() -> ApiClient.postAsync("/matches", payload.toString()).join(), 
-                    res -> {
-                        MainController.getInstance().hideLoading();
-                        hideForm();
-                        loadMatches();
-                    }, 
-                    err -> {
-                        MainController.getInstance().hideLoading();
-                        AppUtil.showAlert(Alert.AlertType.ERROR, "Error", "Failed to create match.");
-                    });
-            } else {
-                AppUtil.runAsync(() -> ApiClient.putAsync("/matches/" + editingMatchId, payload.toString()).join(), 
-                    res -> {
-                        MainController.getInstance().hideLoading();
-                        hideForm();
-                        loadMatches();
-                    }, 
-                    err -> {
-                        MainController.getInstance().hideLoading();
-                        AppUtil.showAlert(Alert.AlertType.ERROR, "Error", "Failed to update match.");
-                    });
-            }
-        } catch (NumberFormatException e) {
-            AppUtil.showAlert(Alert.AlertType.WARNING, "Validation Error", "IDs must be numeric.");
+        JSONObject payload = new JSONObject();
+        payload.put("event_id", eventId);
+        if (venueId != null) payload.put("venue_id", venueId);
+        payload.put("home_team_id", homeTeam);
+        payload.put("away_team_id", awayTeam);
+        payload.put("status", status);
+
+        MainController.getInstance().showLoading("Saving Match...");
+        
+        if (editingMatchId == null) {
+            AppUtil.runAsync(() -> ApiClient.postAsync("/matches", payload.toString()).join(), 
+                res -> {
+                    MainController.getInstance().hideLoading();
+                    hideForm();
+                    loadMatches();
+                }, 
+                err -> {
+                    MainController.getInstance().hideLoading();
+                    AppUtil.showAlert(Alert.AlertType.ERROR, "Error", "Failed to create match: " + err.getMessage());
+                });
+        } else {
+            AppUtil.runAsync(() -> ApiClient.putAsync("/matches/" + editingMatchId, payload.toString()).join(), 
+                res -> {
+                    MainController.getInstance().hideLoading();
+                    hideForm();
+                    loadMatches();
+                }, 
+                err -> {
+                    MainController.getInstance().hideLoading();
+                    AppUtil.showAlert(Alert.AlertType.ERROR, "Error", "Failed to update match: " + err.getMessage());
+                });
         }
     }
 
