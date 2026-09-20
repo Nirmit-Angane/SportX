@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Standings | SPORTX</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .standings-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .standings-table th {
+            background: var(--surface-elevated);
+            color: var(--text-secondary);
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .standings-table th:nth-child(1), .standings-table th:nth-child(2) {
+            text-align: left;
+        }
+        .standings-table td {
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 1.1rem;
+        }
+        .standings-table td:nth-child(1), .standings-table td:nth-child(2) {
+            text-align: left;
+        }
+        .standings-table tbody tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+        .team-cell {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 1.2rem;
+        }
+        .pos {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--text-secondary);
+            width: 30px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="brand">SPORTX</a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="events.html">Events</a>
+                <a href="matches.html">Matches</a>
+                <a href="teams.html">Teams</a>
+                <a href="standings.html" class="active">Standings</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn btn-secondary" style="padding: 0.5rem;"><i data-lucide="search"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container section">
+        <h1 style="font-size: 3rem; margin-bottom: 1rem;">GLOBAL STANDINGS</h1>
+        <p class="text-muted" style="margin-bottom: 3rem;">View current rankings across active tournaments.</p>
+        
+        <div id="standings-container">
+            <div class="skeleton" style="height: 400px; border-radius: var(--radius-lg);"></div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script>
+        lucide.createIcons();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Simplified logic: the backend has /events/:id/standings but we might not have a specific event selected.
+            // Let's fetch all events and just show standings for the first one for demonstration.
+            const eventsRes = await fetchAPI('/events');
+            const container = document.getElementById('standings-container');
+            
+            if (eventsRes.success && eventsRes.data.length > 0) {
+                const eventId = eventsRes.data[0].id;
+                const standingsRes = await fetchAPI(`/events/${eventId}/standings`);
+                
+                if (standingsRes.success && standingsRes.data.length > 0) {
+                    let html = `
+                        <h3 style="margin-bottom: 1.5rem; color: var(--brand-blue); font-family: var(--font-display);">${eventsRes.data[0].name.toUpperCase()}</h3>
+                        <table class="standings-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">#</th>
+                                    <th>Club</th>
+                                    <th>MP</th>
+                                    <th>W</th>
+                                    <th>D</th>
+                                    <th>L</th>
+                                    <th>Pts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    
+                    standingsRes.data.forEach((row, index) => {
+                        html += `
+                            <tr>
+                                <td><span class="pos">${index + 1}</span></td>
+                                <td>
+                                    <div class="team-cell">
+                                        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--surface-elevated); display: flex; align-items: center; justify-content: center; font-size: 1rem; border: 1px solid var(--border-color);">${row.team_name.charAt(0)}</div>
+                                        ${row.team_name}
+                                    </div>
+                                </td>
+                                <td>${row.matches_played}</td>
+                                <td>${row.wins}</td>
+                                <td>${row.draws}</td>
+                                <td>${row.losses}</td>
+                                <td style="color: var(--brand-blue); font-weight: bold; font-family: var(--font-display);">${row.points}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += `</tbody></table>`;
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `<div class="empty-state"><h3>NO STANDINGS DATA</h3><p>No matches have been played in this tournament yet.</p></div>`;
+                }
+            } else {
+                container.innerHTML = `<div class="empty-state"><h3>NO TOURNAMENTS</h3><p>There are no active tournaments to display standings for.</p></div>`;
+            }
+        });
+    </script>
+</body>
+</html>

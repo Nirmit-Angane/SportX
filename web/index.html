@@ -3,47 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SportX - Live Sports Platform</title>
+    <title>SPORTX | Live Sports Network</title>
     <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/components.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
+    <!-- Navbar -->
     <nav class="navbar">
-        <a href="/" class="brand">SPORTX</a>
-        <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="pages/events.html">Events</a>
-            <a href="pages/matches.html">Matches</a>
-            <a href="pages/teams.html">Teams</a>
-            <a href="pages/standings.html">Standings</a>
+        <div class="container">
+            <a href="index.html" class="brand">SPORTX</a>
+            <div class="nav-links">
+                <a href="index.html" class="active">Home</a>
+                <a href="pages/events.html">Events</a>
+                <a href="pages/matches.html">Matches</a>
+                <a href="pages/teams.html">Teams</a>
+                <a href="pages/standings.html">Standings</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn btn-secondary" style="padding: 0.5rem;"><i data-lucide="search"></i></button>
+            </div>
         </div>
     </nav>
 
-    <div class="container">
-        <div class="hero" style="text-align: center; padding: 4rem 0;">
-            <h1 style="font-size: 3rem; margin-bottom: 1rem;"><span class="text-blue">LIVE SPORTS.</span> ONE PLATFORM.</h1>
-            <p class="text-muted" style="font-size: 1.2rem; margin-bottom: 2rem;">Experience real-time scores, standings, and match updates instantly.</p>
-            <a href="#live-matches" class="btn">VIEW LIVE SCORES</a>
-        </div>
-
-        <h2 id="live-matches">Live Matches</h2>
-        <div id="matches-container">
-            <!-- Matches injected by JS -->
-            <div class="card">
-                <div class="live-indicator">● LIVE</div>
-                <div class="teams-container" style="margin: 1rem 0;">
-                    <div class="team-name" style="text-align: right;">VIVA Warriors</div>
-                    <div class="score">2 - 1</div>
-                    <div class="team-name" style="text-align: left;">Mumbai Titans</div>
-                </div>
-                <div style="text-align: center;">
-                    <a href="pages/match.html?id=10" class="btn">View Match</a>
-                </div>
+    <!-- SECTION 01: Hero -->
+    <section class="container hero-section">
+        <div class="hero-content">
+            <span class="label">SPORTX / LIVE SPORTS NETWORK</span>
+            <h1>LIVE SPORTS.<br><span class="text-brand">ONE PLATFORM.</span></h1>
+            <p>Follow live matches, tournaments, teams, results and standings from one unified premium platform.</p>
+            <div class="hero-actions">
+                <a href="#live-now" class="btn btn-primary">VIEW LIVE MATCHES</a>
+                <a href="pages/events.html" class="btn btn-secondary">EXPLORE EVENTS</a>
             </div>
         </div>
-    </div>
+        
+        <div class="hero-scoreboard" id="hero-live-feature">
+            <!-- Populated by JS -->
+            <div class="skeleton" style="height: 300px; border-radius: var(--radius-lg);"></div>
+        </div>
+    </section>
+
+    <!-- SECTION 02: Live Now -->
+    <section class="section" id="live-now" style="background: var(--surface-elevated); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+        <div class="container">
+            <h2 class="section-header">LIVE NOW</h2>
+            <p class="section-subtitle">Matches happening right now across all tournaments.</p>
+            
+            <div class="live-rail" id="live-matches-rail">
+                <!-- Populated by JS -->
+                <div class="skeleton card-live" style="height: 180px;"></div>
+                <div class="skeleton card-live" style="height: 180px;"></div>
+                <div class="skeleton card-live" style="height: 180px;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 03: Featured Tournament -->
+    <section class="section container">
+        <div class="tournament-feature" id="featured-tournament">
+            <!-- Populated by JS -->
+            <div class="skeleton" style="height: 300px; border-radius: var(--radius-lg);"></div>
+        </div>
+    </section>
+
+    <!-- Layout Grid for Up Next & Results -->
+    <section class="section container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;">
+        <!-- SECTION 04: Upcoming Matches -->
+        <div>
+            <h2 class="section-header">UP NEXT</h2>
+            <p class="section-subtitle">Upcoming fixtures across the network.</p>
+            <div class="fixture-list" id="upcoming-matches">
+                <div class="skeleton" style="height: 80px; margin-bottom: 1rem;"></div>
+                <div class="skeleton" style="height: 80px; margin-bottom: 1rem;"></div>
+                <div class="skeleton" style="height: 80px; margin-bottom: 1rem;"></div>
+            </div>
+            <a href="pages/matches.html" class="btn btn-secondary" style="width: 100%; margin-top: 2rem;">ALL UPCOMING →</a>
+        </div>
+
+        <!-- SECTION 05: Recent Results -->
+        <div>
+            <h2 class="section-header">LATEST RESULTS</h2>
+            <p class="section-subtitle">Completed matches and final scores.</p>
+            <div class="fixture-list" id="recent-results">
+                <div class="skeleton" style="height: 80px; margin-bottom: 1rem;"></div>
+                <div class="skeleton" style="height: 80px; margin-bottom: 1rem;"></div>
+                <div class="skeleton" style="height: 80px; margin-bottom: 1rem;"></div>
+            </div>
+            <a href="pages/matches.html" class="btn btn-secondary" style="width: 100%; margin-top: 2rem;">ALL RESULTS →</a>
+        </div>
+    </section>
+
+    <!-- SECTION 07: Teams -->
+    <section class="section container">
+        <h2 class="section-header">TEAMS IN THE SPOTLIGHT</h2>
+        <p class="section-subtitle">Top competing teams.</p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 2rem;" id="teams-grid">
+            <!-- Populated by JS -->
+            <div class="skeleton" style="height: 150px; border-radius: var(--radius-md);"></div>
+            <div class="skeleton" style="height: 150px; border-radius: var(--radius-md);"></div>
+            <div class="skeleton" style="height: 150px; border-radius: var(--radius-md);"></div>
+            <div class="skeleton" style="height: 150px; border-radius: var(--radius-md);"></div>
+        </div>
+    </section>
+
+    <!-- SECTION 09: Final CTA -->
+    <section class="section" style="text-align: center; padding: 8rem 0; border-top: 1px dashed var(--border-color); margin-top: 4rem;">
+        <div class="container">
+            <h2 style="font-size: 4rem; line-height: 1.1; margin-bottom: 2rem;">EVERY MATCH.<br>EVERY RESULT.<br><span class="text-brand">ONE PLATFORM.</span></h2>
+            <a href="pages/matches.html" class="btn btn-primary" style="font-size: 1.5rem; padding: 1rem 3rem;">EXPLORE SPORTX</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <a href="/" class="brand" style="font-size: 2rem;">SPORTX</a>
+                    <p class="text-muted" style="margin-top: 1rem; max-width: 250px;">LIVE SPORTS. ONE PLATFORM. Experience real-time scores instantly.</p>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 1.5rem;">Navigation</h4>
+                    <div class="footer-links">
+                        <a href="index.html">Home</a>
+                        <a href="pages/events.html">Events</a>
+                        <a href="pages/matches.html">Matches</a>
+                        <a href="pages/teams.html">Teams</a>
+                        <a href="pages/standings.html">Standings</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 1.5rem;">Information</h4>
+                    <div class="footer-links">
+                        <a href="#">About Us</a>
+                        <a href="#">Contact</a>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SPORTX. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>
+    <script>
+      // Initialize Lucide icons
+      lucide.createIcons();
+    </script>
 </body>
 </html>

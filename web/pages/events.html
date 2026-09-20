@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events & Tournaments | SPORTX</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="brand">SPORTX</a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="events.html" class="active">Events</a>
+                <a href="matches.html">Matches</a>
+                <a href="teams.html">Teams</a>
+                <a href="standings.html">Standings</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn btn-secondary" style="padding: 0.5rem;"><i data-lucide="search"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container section">
+        <h1 style="font-size: 3rem; margin-bottom: 2rem;">TOURNAMENTS & EVENTS</h1>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem;" id="events-grid">
+            <div class="skeleton" style="height: 200px; border-radius: var(--radius-lg);"></div>
+            <div class="skeleton" style="height: 200px; border-radius: var(--radius-lg);"></div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script>
+        lucide.createIcons();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const res = await fetchAPI('/events');
+            const gridEl = document.getElementById('events-grid');
+            
+            if (res.success) {
+                if (res.data.length === 0) {
+                    gridEl.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;"><h3>NO EVENTS</h3><p>There are currently no active tournaments.</p></div>`;
+                    return;
+                }
+                gridEl.innerHTML = res.data.map(event => `
+                    <div class="card" style="position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: -20px; right: -20px; font-size: 10rem; opacity: 0.03; font-family: var(--font-display); pointer-events: none;">${event.name.charAt(0)}</div>
+                        <h3 style="font-size: 1.5rem; color: var(--brand-blue); margin-bottom: 1rem; position: relative;">${event.name}</h3>
+                        <p class="text-muted" style="margin-bottom: 0.5rem;"><i data-lucide="map-pin" style="width: 16px; height: 16px; vertical-align: middle;"></i> ${event.location || 'TBA'}</p>
+                        <p class="text-muted" style="margin-bottom: 2rem;"><i data-lucide="calendar" style="width: 16px; height: 16px; vertical-align: middle;"></i> ${event.start_date ? event.start_date.substring(0,10) : 'TBA'} - ${event.end_date ? event.end_date.substring(0,10) : 'TBA'}</p>
+                        <a href="matches.html?event_id=${event.id}" class="btn btn-secondary" style="width: 100%;">VIEW MATCHES</a>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            } else {
+                gridEl.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;">Failed to load events.</div>';
+            }
+        });
+    </script>
+</body>
+</html>

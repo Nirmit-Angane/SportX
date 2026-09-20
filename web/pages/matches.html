@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Schedule | SPORTX</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="brand">SPORTX</a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="events.html">Events</a>
+                <a href="matches.html" class="active">Matches</a>
+                <a href="teams.html">Teams</a>
+                <a href="standings.html">Standings</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn btn-secondary" style="padding: 0.5rem;"><i data-lucide="search"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container section">
+        <h1 style="font-size: 3rem; margin-bottom: 2rem;">MATCH CENTER</h1>
+        
+        <div class="mc-tabs" style="justify-content: flex-start; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color);">
+            <a href="#" class="mc-tab active" onclick="filterMatches('ALL', this)">ALL</a>
+            <a href="#" class="mc-tab" onclick="filterMatches('LIVE', this)">LIVE</a>
+            <a href="#" class="mc-tab" onclick="filterMatches('SCHEDULED', this)">UPCOMING</a>
+            <a href="#" class="mc-tab" onclick="filterMatches('COMPLETED', this)">RESULTS</a>
+        </div>
+
+        <div class="fixture-list" id="matches-list">
+            <div class="skeleton" style="height: 80px; margin-bottom: 1rem;"></div>
+            <div class="skeleton" style="height: 80px; margin-bottom: 1rem;"></div>
+            <div class="skeleton" style="height: 80px; margin-bottom: 1rem;"></div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script>
+        lucide.createIcons();
+        let allMatches = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const res = await fetchAPI('/matches');
+            if (res.success) {
+                allMatches = res.data;
+                renderMatches('ALL');
+            } else {
+                document.getElementById('matches-list').innerHTML = '<div class="empty-state">Failed to load matches.</div>';
+            }
+        });
+
+        function filterMatches(status, element) {
+            document.querySelectorAll('.mc-tab').forEach(t => t.classList.remove('active'));
+            if(element) element.classList.add('active');
+            renderMatches(status);
+        }
+
+        function renderMatches(status) {
+            const listEl = document.getElementById('matches-list');
+            let filtered = status === 'ALL' ? allMatches : allMatches.filter(m => m.status === status);
+            
+            if (filtered.length === 0) {
+                listEl.innerHTML = `<div class="empty-state"><i data-lucide="calendar" style="width: 48px; height: 48px; margin-bottom: 1rem;"></i><h3>NO MATCHES FOUND</h3><p>Try selecting a different filter.</p></div>`;
+                lucide.createIcons();
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(match => {
+                const homeWin = match.home_score > match.away_score;
+                const awayWin = match.away_score > match.home_score;
+                const isLive = match.status === 'LIVE';
+                
+                return `
+                <a href="match.html?id=${match.id}" class="fixture-row" style="${isLive ? 'border-left: 4px solid var(--accent-red);' : ''}">
+                    <div class="f-time">${isLive ? '<span class="text-red">LIVE</span>' : (match.status === 'COMPLETED' ? 'FT' : (match.match_time ? match.match_time.substring(0,5) : 'TBA'))}</div>
+                    <div class="f-team home" style="${homeWin && match.status === 'COMPLETED' ? 'color: var(--brand-blue);' : ''}">${match.home_team_name}</div>
+                    <div class="f-vs-score" style="${isLive ? 'color: var(--accent-red); border: 1px solid var(--accent-red);' : ''}">${match.status === 'SCHEDULED' ? 'VS' : `${match.home_score} - ${match.away_score}`}</div>
+                    <div class="f-team away" style="${awayWin && match.status === 'COMPLETED' ? 'color: var(--brand-blue);' : ''}">${match.away_team_name}</div>
+                    <div class="f-tournament">${match.round || 'MATCH'}</div>
+                    <div class="f-action">VIEW →</div>
+                </a>
+            `}).join('');
+        }
+    </script>
+</body>
+</html>

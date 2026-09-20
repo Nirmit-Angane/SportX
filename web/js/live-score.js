@@ -1,14 +1,12 @@
-// Get Match ID from URL params
 const urlParams = new URLSearchParams(window.location.search);
 const matchId = urlParams.get('id');
 
-// DOM Elements
 const homeTeamEl = document.getElementById('home-team');
 const awayTeamEl = document.getElementById('away-team');
 const homeScoreEl = document.getElementById('home-score');
 const awayScoreEl = document.getElementById('away-score');
 const timerEl = document.getElementById('timer');
-const matchDetailsEl = document.getElementById('match-details');
+const matchMetaEl = document.getElementById('match-meta');
 const venueDetailsEl = document.getElementById('venue-details');
 const statusIndicator = document.getElementById('status-indicator');
 
@@ -16,7 +14,7 @@ let pollingInterval;
 
 async function loadMatchDetails() {
     if (!matchId) {
-        matchDetailsEl.innerText = "Error: No Match ID provided.";
+        document.querySelector('.mc-score-grid').innerHTML = '<div style="color: var(--accent-red); font-size: 2rem;">Error: No Match ID provided.</div>';
         return;
     }
 
@@ -25,56 +23,63 @@ async function loadMatchDetails() {
         const match = response.data;
         homeTeamEl.innerText = match.home_team_name || 'Home Team';
         awayTeamEl.innerText = match.away_team_name || 'Away Team';
-        homeScoreEl.innerText = match.home_score !== null ? match.home_score : '-';
-        awayScoreEl.innerText = match.away_score !== null ? match.away_score : '-';
+        homeScoreEl.innerText = match.home_score !== null ? match.home_score : '0';
+        awayScoreEl.innerText = match.away_score !== null ? match.away_score : '0';
         timerEl.innerText = match.timer || '00:00';
+        matchMetaEl.innerText = `${match.round || 'MATCH'} • SPORTX CENTER`;
         venueDetailsEl.innerText = `VENUE: ${match.venue_name || 'TBA'}`;
         
-        if (match.status === 'LIVE') {
-            statusIndicator.innerHTML = '● LIVE';
-            statusIndicator.style.color = 'var(--accent-red)';
-            statusIndicator.style.animation = 'pulse 2s infinite';
-        } else {
-            statusIndicator.innerHTML = match.status;
-            statusIndicator.style.color = 'var(--text-muted)';
-            statusIndicator.style.animation = 'none';
-        }
+        updateStatusIndicator(match.status);
     } else {
-        matchDetailsEl.innerText = "Match not found or server offline.";
+        document.querySelector('.mc-score-grid').innerHTML = '<div style="color: var(--accent-red); font-size: 2rem;">Match not found.</div>';
     }
 }
 
-// Polling for live score updates (Phase 11)
+function updateStatusIndicator(status) {
+    if (status === 'LIVE') {
+        statusIndicator.innerHTML = '<div class="live-dot"></div> LIVE';
+        statusIndicator.style.color = 'var(--accent-red)';
+    } else {
+        statusIndicator.innerHTML = status;
+        statusIndicator.style.color = 'var(--text-secondary)';
+    }
+}
+
 function startScorePolling() {
-    // Poll every 3 seconds
     pollingInterval = setInterval(async () => {
         if (!matchId) return;
         const response = await fetchAPI(`/matches/${matchId}/score`);
         if (response.success) {
             const score = response.data;
-            if (homeScoreEl.innerText != score.home_score) {
+            
+            // Handle Home Score Animation
+            if (homeScoreEl.innerText != score.home_score && score.home_score !== null) {
                 homeScoreEl.innerText = score.home_score;
-                animateScoreUpdate(homeScoreEl);
+                triggerScoreAnimation(homeScoreEl);
             }
-            if (awayScoreEl.innerText != score.away_score) {
+            // Handle Away Score Animation
+            if (awayScoreEl.innerText != score.away_score && score.away_score !== null) {
                 awayScoreEl.innerText = score.away_score;
-                animateScoreUpdate(awayScoreEl);
+                triggerScoreAnimation(awayScoreEl);
             }
+            // Handle Timer
             if (timerEl.innerText != score.timer) {
-                timerEl.innerText = score.timer;
+                timerEl.innerText = score.timer || '00:00';
             }
+            // Assuming the status might change from API in a real scenario, we could fetch the full match occasionally, but this is fine for now.
         }
     }, 3000);
 }
 
-function animateScoreUpdate(element) {
-    element.style.color = 'var(--text-main)';
-    setTimeout(() => {
-        element.style.color = 'var(--accent-blue)';
-    }, 300);
+function triggerScoreAnimation(element) {
+    // Remove class if it exists to restart animation
+    element.classList.remove('score-updated');
+    // Trigger reflow
+    void element.offsetWidth;
+    // Add class back
+    element.classList.add('score-updated');
 }
 
-// Initialize
 if (matchId) {
     loadMatchDetails();
     startScorePolling();

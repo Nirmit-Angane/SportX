@@ -3,41 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Match Live Score - SportX</title>
+    <title>Match Center | SPORTX</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/components.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
+    <!-- Navbar -->
     <nav class="navbar">
-        <a href="../index.html" class="brand">SPORTX</a>
+        <div class="container">
+            <a href="../index.html" class="brand">SPORTX</a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="events.html">Events</a>
+                <a href="matches.html" class="active">Matches</a>
+                <a href="teams.html">Teams</a>
+                <a href="standings.html">Standings</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn btn-secondary" style="padding: 0.5rem;"><i data-lucide="search"></i></button>
+            </div>
+        </div>
     </nav>
 
-    <div class="container">
-        <div class="score-board">
-            <div class="live-indicator" id="status-indicator">● LIVE</div>
-            <div style="margin-top: 1rem; color: var(--text-muted);" id="match-details">
-                FOOTBALL • SEMIFINAL
-            </div>
-
-            <div class="teams-container">
-                <div class="team-name" id="home-team" style="text-align: right;">Loading...</div>
-                <div style="display: flex; gap: 1rem; align-items: center;">
-                    <div class="score" id="home-score">-</div>
-                    <div class="vs">-</div>
-                    <div class="score" id="away-score">-</div>
-                </div>
-                <div class="team-name" id="away-team" style="text-align: left;">Loading...</div>
-            </div>
-
-            <div class="timer" id="timer">00:00</div>
+    <!-- Big Scoreboard -->
+    <header class="match-center-header">
+        <div class="container">
+            <div class="mc-meta" id="match-meta">SPORTX MATCH CENTER</div>
             
-            <div style="margin-top: 2rem; color: var(--text-muted);" id="venue-details">
-                VENUE: Loading...
+            <div id="status-indicator-wrapper" style="margin-bottom: 2rem;">
+                <div class="live-indicator" id="status-indicator"></div>
             </div>
+
+            <div class="mc-score-grid">
+                <div class="mc-team home" id="home-team">Loading...</div>
+                
+                <div class="mc-score-box">
+                    <div class="mc-score-num" id="home-score">-</div>
+                    <div class="mc-divider">—</div>
+                    <div class="mc-score-num" id="away-score">-</div>
+                </div>
+                
+                <div class="mc-team away" id="away-team">Loading...</div>
+            </div>
+
+            <div class="mc-timer" id="timer">00:00</div>
+            
+            <div style="margin-top: 3rem; color: var(--text-secondary); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;" id="venue-details">
+                VENUE: LOADING...
+            </div>
+        </div>
+    </header>
+
+    <!-- Match Tabs -->
+    <div class="mc-tabs">
+        <a href="#" class="mc-tab active">OVERVIEW</a>
+        <a href="#" class="mc-tab">TIMELINE</a>
+        <a href="#" class="mc-tab">STATS</a>
+    </div>
+
+    <!-- Match Content (Simplified for now) -->
+    <div class="container section">
+        <div class="empty-state" style="max-width: 600px; margin: 0 auto; border: none; background: transparent;">
+            <i data-lucide="activity" style="width: 48px; height: 48px; margin-bottom: 1rem; color: var(--brand-blue);"></i>
+            <h3>MATCH EVENTS</h3>
+            <p>Detailed timeline and statistics are currently unavailable for this match.</p>
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <a href="../index.html" class="brand" style="font-size: 2rem;">SPORTX</a>
+                    <p class="text-muted" style="margin-top: 1rem; max-width: 250px;">LIVE SPORTS. ONE PLATFORM. Experience real-time scores instantly.</p>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 1.5rem;">Navigation</h4>
+                    <div class="footer-links">
+                        <a href="../index.html">Home</a>
+                        <a href="events.html">Events</a>
+                        <a href="matches.html">Matches</a>
+                        <a href="teams.html">Teams</a>
+                        <a href="standings.html">Standings</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 1.5rem;">Information</h4>
+                    <div class="footer-links">
+                        <a href="#">About Us</a>
+                        <a href="#">Contact</a>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SPORTX. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
     <script src="../js/api.js"></script>
     <script src="../js/live-score.js"></script>
+    <script>lucide.createIcons();</script>
 </body>
 </html>
