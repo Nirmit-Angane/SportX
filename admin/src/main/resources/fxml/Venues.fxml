@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" spacing="15" style="-fx-background-color: #0F172A;" alignment="CENTER">
-    <Label text="Placeholder View" styleClass="page-title"/>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      spacing="20" style="-fx-background-color: -fx-base-bg;">
+    
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+    <Label text="VENUE MANAGEMENT (COMING SOON)" styleClass="page-title"/>
+    <Label text="This module will use the exact same architecture as Events and Teams." style="-fx-text-fill: -fx-text-secondary;"/>
 </VBox>

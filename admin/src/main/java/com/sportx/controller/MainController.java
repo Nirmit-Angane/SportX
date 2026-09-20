@@ -1,31 +1,66 @@
 package com.sportx.controller;
 
 import com.sportx.App;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import java.io.IOException;
 
 public class MainController {
 
+    private static MainController instance;
+
     @FXML private StackPane contentArea;
+    @FXML private VBox loadingOverlay;
+    @FXML private Label loadingLabel;
+    @FXML private Label pageTitleLabel;
+    
+    @FXML private Button btnDashboard;
+    @FXML private Button btnEvents;
+    @FXML private Button btnTeams;
+    @FXML private Button btnPlayers;
+    @FXML private Button btnVenues;
+    @FXML private Button btnMatches;
+    @FXML private Button btnLiveScore;
+    @FXML private Button btnQRCodes;
+
+    private Button currentActiveButton;
+
+    public MainController() {
+        instance = this;
+    }
+
+    public static MainController getInstance() {
+        return instance;
+    }
 
     @FXML
     public void initialize() {
-        loadView("Dashboard");
+        showDashboard();
     }
 
-    @FXML public void showDashboard() { loadView("Dashboard"); }
-    @FXML public void showEvents() { loadView("Events"); }
-    @FXML public void showTeams() { loadView("Teams"); }
-    @FXML public void showPlayers() { loadView("Players"); }
-    @FXML public void showVenues() { loadView("Venues"); }
-    @FXML public void showMatches() { loadView("Matches"); }
-    @FXML public void showLiveScore() { loadView("LiveScore"); }
-    @FXML public void showQRCodes() { loadView("QR"); }
+    @FXML public void showDashboard() { loadView("Dashboard", "Operations Overview", btnDashboard); }
+    @FXML public void showEvents() { loadView("Events", "Event Management", btnEvents); }
+    @FXML public void showTeams() { loadView("Teams", "Team Management", btnTeams); }
+    @FXML public void showPlayers() { loadView("Players", "Player Management", btnPlayers); }
+    @FXML public void showVenues() { loadView("Venues", "Venue Management", btnVenues); }
+    @FXML public void showMatches() { loadView("Matches", "Match Management", btnMatches); }
+    @FXML public void showLiveScore() { loadView("LiveScore", "Live Match Control", btnLiveScore); }
+    @FXML public void showQRCodes() { loadView("QR", "QR Code Center", btnQRCodes); }
 
-    private void loadView(String fxml) {
+    private void loadView(String fxml, String title, Button sourceButton) {
+        if (currentActiveButton != null) {
+            currentActiveButton.getStyleClass().remove("active-btn");
+        }
+        sourceButton.getStyleClass().add("active-btn");
+        currentActiveButton = sourceButton;
+        pageTitleLabel.setText(title);
+
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/fxml/" + fxml + ".fxml"));
             Parent view = fxmlLoader.load();
@@ -34,5 +69,18 @@ public class MainController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void showLoading(String message) {
+        Platform.runLater(() -> {
+            loadingLabel.setText(message != null ? message : "Loading...");
+            loadingOverlay.setVisible(true);
+        });
+    }
+
+    public void hideLoading() {
+        Platform.runLater(() -> {
+            loadingOverlay.setVisible(false);
+        });
     }
 }

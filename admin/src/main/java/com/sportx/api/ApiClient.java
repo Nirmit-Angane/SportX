@@ -5,6 +5,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class ApiClient {
@@ -30,46 +31,62 @@ public class ApiClient {
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
-    public static String get(String endpoint) throws Exception {
+    public static CompletableFuture<String> getAsync(String endpoint) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + endpoint))
                 .GET()
                 .build();
-        return sendRequest(request);
+        return sendRequestAsync(request);
     }
 
-    public static String post(String endpoint, String jsonBody) throws Exception {
+    public static CompletableFuture<String> postAsync(String endpoint, String jsonBody) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + endpoint))
                 .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody != null ? jsonBody : "{}"))
                 .build();
-        return sendRequest(request);
+        return sendRequestAsync(request);
     }
 
-    public static String put(String endpoint, String jsonBody) throws Exception {
+    public static CompletableFuture<String> putAsync(String endpoint, String jsonBody) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + endpoint))
                 .header("Content-Type", "application/json")
-                .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .PUT(HttpRequest.BodyPublishers.ofString(jsonBody != null ? jsonBody : "{}"))
                 .build();
-        return sendRequest(request);
+        return sendRequestAsync(request);
     }
 
-    public static String delete(String endpoint) throws Exception {
+    public static CompletableFuture<String> deleteAsync(String endpoint) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + endpoint))
                 .DELETE()
                 .build();
-        return sendRequest(request);
+        return sendRequestAsync(request);
     }
 
-    private static String sendRequest(HttpRequest request) throws Exception {
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() >= 200 && response.statusCode() < 300) {
-            return response.body();
-        } else {
-            throw new Exception("API Request failed with status " + response.statusCode() + ": " + response.body());
-        }
+    private static CompletableFuture<String> sendRequestAsync(HttpRequest request) {
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenCompose(response -> {
+                    if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                        return CompletableFuture.completedFuture(response.body());
+                    } else {
+                        return CompletableFuture.failedFuture(new RuntimeException("API Request failed with status " + response.statusCode() + ": " + response.body()));
+                    }
+                });
+    }
+    
+    // Kept for backward compatibility while migrating, will be removed later
+    public static String get(String endpoint) throws Exception {
+        return getAsync(endpoint).join();
+    }
+    public static String post(String endpoint, String jsonBody) throws Exception {
+        return postAsync(endpoint, jsonBody).join();
+    }
+    public static String put(String endpoint, String jsonBody) throws Exception {
+        return putAsync(endpoint, jsonBody).join();
+    }
+    public static String delete(String endpoint) throws Exception {
+        return deleteAsync(endpoint).join();
     }
 }
