@@ -1,5 +1,5 @@
-// API Configuration
-const API_BASE_URL = 'http://localhost:5000/api';
+// API Configuration (loaded from config.js)
+const API_BASE_URL = window.ENV ? window.ENV.API_BASE_URL : 'http://localhost:5000/api';
 
 async function fetchAPI(endpoint, options = {}) {
     try {
