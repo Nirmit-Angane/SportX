@@ -12,6 +12,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainController {
 
@@ -28,6 +30,7 @@ public class MainController {
     @FXML private Button btnPlayers;
     @FXML private Button btnVenues;
     @FXML private Button btnMatches;
+    @FXML private Button btnBrackets;
     @FXML private Button btnLiveScore;
     @FXML private Button btnQRCodes;
     
@@ -40,6 +43,8 @@ public class MainController {
     
     private double xOffset = 0;
     private double yOffset = 0;
+    
+    private Map<String, Parent> viewCache = new HashMap<>();
 
     public MainController() {
         instance = this;
@@ -109,6 +114,7 @@ public class MainController {
     @FXML public void showPlayers() { loadView("Players", "Player Management", btnPlayers); }
     @FXML public void showVenues() { loadView("Venues", "Venue Management", btnVenues); }
     @FXML public void showMatches() { loadView("Matches", "Match Management", btnMatches); }
+    @FXML public void showBrackets() { loadView("Brackets", "Tournament Brackets", btnBrackets); }
     @FXML public void showLiveScore() { loadView("LiveScore", "Live Match Control", btnLiveScore); }
     @FXML public void showQRCodes() { loadView("QR", "QR Code Center", btnQRCodes); }
 
@@ -121,8 +127,12 @@ public class MainController {
         pageTitleLabel.setText(title);
 
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/fxml/" + fxml + ".fxml"));
-            Parent view = fxmlLoader.load();
+            Parent view = viewCache.get(fxml);
+            if (view == null) {
+                FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/fxml/" + fxml + ".fxml"));
+                view = fxmlLoader.load();
+                viewCache.put(fxml, view);
+            }
             contentArea.getChildren().clear();
             contentArea.getChildren().add(view);
         } catch (IOException e) {

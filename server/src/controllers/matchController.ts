@@ -58,7 +58,9 @@ export const getMatchById = async (req: Request, res: Response) => {
 export const createMatch = async (req: Request, res: Response) => {
   try {
     const { event_id, sport_id, home_team_id, away_team_id, venue_id, match_date, match_time, round, status } = req.body;
-    if (home_team_id === away_team_id) return sendError(res, 'Home team cannot be the same as away team', 400);
+    if (home_team_id !== undefined && away_team_id !== undefined && home_team_id === away_team_id) {
+        return sendError(res, 'Home team cannot be the same as away team', 400);
+    }
 
     const result = await query(
       `INSERT INTO matches (event_id, sport_id, home_team_id, away_team_id, venue_id, match_date, match_time, round, status) 

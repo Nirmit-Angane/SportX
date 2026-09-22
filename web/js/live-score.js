@@ -39,6 +39,12 @@ function updateStatusIndicator(status) {
     if (status === 'LIVE') {
         statusIndicator.innerHTML = '<div class="live-dot"></div> LIVE';
         statusIndicator.style.color = 'var(--accent-red)';
+    } else if (status === 'TIMEOUT') {
+        statusIndicator.innerHTML = '<div class="live-dot" style="background-color: #F5A623; box-shadow: 0 0 10px #F5A623;"></div> TIMEOUT';
+        statusIndicator.style.color = '#F5A623';
+    } else if (status === 'UNDER REVIEW') {
+        statusIndicator.innerHTML = '<div class="live-dot" style="background-color: #F8E71C; box-shadow: 0 0 10px #F8E71C;"></div> UNDER REVIEW';
+        statusIndicator.style.color = '#F8E71C';
     } else {
         statusIndicator.innerHTML = status;
         statusIndicator.style.color = 'var(--text-secondary)';

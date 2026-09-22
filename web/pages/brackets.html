@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Brackets | SPORTX</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/bracket.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="brand">SPORTX</a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="events.html">Events</a>
+                <a href="matches.html">Matches</a>
+                <a href="brackets.html" class="active">Brackets</a>
+                <a href="teams.html">Teams</a>
+                <a href="standings.html">Standings</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn btn-secondary" style="padding: 0.5rem;"><i data-lucide="search"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container section">
+        <h1 style="font-size: 3rem; margin-bottom: 1rem;">TOURNAMENT BRACKETS</h1>
+        
+        <div style="margin-bottom: 3rem;">
+            <select id="event-select" class="input-field" style="max-width: 300px;" onchange="loadBracketForEvent(this.value)">
+                <option value="">Select Event...</option>
+            </select>
+        </div>
+
+        <div id="bracket-view" style="display: none; background: var(--surface-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color);">
+            <div class="bracket-container" id="bracket-container" style="gap: 50px;">
+                <!-- Quarter Finals -->
+                <div class="bracket-round">
+                    <div class="bracket-title">QUARTER-FINALS</div>
+                    <div class="bracket-match" id="qf1"></div>
+                    <div class="bracket-match" id="qf2"></div>
+                    <div class="bracket-match" id="qf3"></div>
+                    <div class="bracket-match" id="qf4"></div>
+                </div>
+
+                <!-- Semi Finals -->
+                <div class="bracket-round" style="justify-content: space-around;">
+                    <div class="bracket-title">SEMI-FINALS</div>
+                    <div class="bracket-match" id="sf1" style="margin-bottom: 4rem;"></div>
+                    <div class="bracket-match" id="sf2"></div>
+                </div>
+
+                <!-- Final -->
+                <div class="bracket-round" style="justify-content: center;">
+                    <div class="bracket-title">CHAMPIONSHIP</div>
+                    <div class="bracket-match" id="final" style="border: 2px solid var(--accent-red);"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="no-bracket" class="empty-state" style="display: none;">
+            <i data-lucide="layout-template" style="width: 48px; height: 48px; margin-bottom: 1rem;"></i>
+            <h3>NO BRACKET FOUND</h3>
+            <p>This event does not have a generated bracket yet.</p>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script>
+        lucide.createIcons();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const res = await fetchAPI('/events');
+            if (res.success) {
+                const select = document.getElementById('event-select');
+                res.data.forEach(e => {
+                    select.innerHTML += `<option value="${e.id}">${e.name}</option>`;
+                });
+            }
+        });
+
+        async function loadBracketForEvent(eventId) {
+            if (!eventId) {
+                document.getElementById('bracket-view').style.display = 'none';
+                document.getElementById('no-bracket').style.display = 'none';
+                return;
+            }
+
+            const res = await fetchAPI('/matches?event_id=' + eventId);
+            if (res.success) {
+                const bracketMatches = res.data.filter(m => m.round && m.round.startsWith('Bracket:'));
+                if (bracketMatches.length === 0) {
+                    document.getElementById('bracket-view').style.display = 'none';
+                    document.getElementById('no-bracket').style.display = 'flex';
+                } else {
+                    document.getElementById('no-bracket').style.display = 'none';
+                    document.getElementById('bracket-view').style.display = 'block';
+                    
+                    renderMatch(bracketMatches.find(m => m.round === 'Bracket: QF 1'), 'qf1');
+                    renderMatch(bracketMatches.find(m => m.round === 'Bracket: QF 2'), 'qf2');
+                    renderMatch(bracketMatches.find(m => m.round === 'Bracket: QF 3'), 'qf3');
+                    renderMatch(bracketMatches.find(m => m.round === 'Bracket: QF 4'), 'qf4');
+                    renderMatch(bracketMatches.find(m => m.round === 'Bracket: SF 1'), 'sf1');
+                    renderMatch(bracketMatches.find(m => m.round === 'Bracket: SF 2'), 'sf2');
+                    renderMatch(bracketMatches.find(m => m.round === 'Bracket: Final'), 'final');
+                }
+            }
+        }
+
+        function renderMatch(match, elementId) {
+            const el = document.getElementById(elementId);
+            if (!match) {
+                el.innerHTML = `<div class="team"><span>TBD</span><span class="score">-</span></div><div class="team"><span>TBD</span><span class="score">-</span></div>`;
+                return;
+            }
+            
+            let hWin = false, aWin = false;
+            if (match.status === 'COMPLETED') {
+                if (match.home_score > match.away_score) hWin = true;
+                if (match.away_score > match.home_score) aWin = true;
+            }
+            
+            el.innerHTML = `
+                <div class="team ${hWin ? 'winner' : ''}">
+                    <span>${match.home_team_name || 'TBD'}</span>
+                    <span class="score">${match.home_team_name ? match.home_score : '-'}</span>
+                </div>
+                <div class="team ${aWin ? 'winner' : ''}">
+                    <span>${match.away_team_name || 'TBD'}</span>
+                    <span class="score">${match.away_team_name ? match.away_score : '-'}</span>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

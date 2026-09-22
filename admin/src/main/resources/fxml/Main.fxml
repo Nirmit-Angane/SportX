@@ -42,6 +42,9 @@
                 <Button fx:id="btnMatches" text="Matches" onAction="#showMatches" styleClass="sidebar-btn" maxWidth="Infinity">
                     <padding><Insets top="12" right="20" bottom="12" left="25"/></padding>
                 </Button>
+                <Button fx:id="btnBrackets" text="Brackets" onAction="#showBrackets" styleClass="sidebar-btn" maxWidth="Infinity">
+                    <padding><Insets top="12" right="20" bottom="12" left="25"/></padding>
+                </Button>
                 <Button fx:id="btnLiveScore" text="Live Score" onAction="#showLiveScore" styleClass="sidebar-btn" maxWidth="Infinity">
                     <padding><Insets top="12" right="20" bottom="12" left="25"/></padding>
                 </Button>

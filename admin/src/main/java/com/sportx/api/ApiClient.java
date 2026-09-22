@@ -23,7 +23,7 @@ public class ApiClient {
             // Ignore if .env can't be parsed
         }
         
-        return "http://localhost:5000/api";
+        return "https://sportx-api-izap.onrender.com/api";
     }
     
     private static final HttpClient client = HttpClient.newBuilder()

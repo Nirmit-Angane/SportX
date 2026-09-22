@@ -44,7 +44,7 @@ async function loadHomepageData() {
 
 function renderHeroLive(matches) {
     const heroEl = document.getElementById('hero-live-feature');
-    const liveMatches = matches.filter(m => m.status === 'LIVE');
+    const liveMatches = matches.filter(m => ['LIVE', 'TIMEOUT', 'UNDER REVIEW'].includes(m.status));
     
     if (liveMatches.length === 0) {
         heroEl.innerHTML = `
@@ -88,7 +88,7 @@ function renderHeroLive(matches) {
 
 function renderLiveRail(matches) {
     const railEl = document.getElementById('live-matches-rail');
-    const liveMatches = matches.filter(m => m.status === 'LIVE');
+    const liveMatches = matches.filter(m => ['LIVE', 'TIMEOUT', 'UNDER REVIEW'].includes(m.status));
     
     if (liveMatches.length === 0) {
         railEl.innerHTML = `<p class="text-muted" style="padding: 2rem;">No matches currently live.</p>`;

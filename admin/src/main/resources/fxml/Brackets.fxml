@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.sportx.controller.BracketsController"
+      spacing="20" style="-fx-background-color: -fx-base-bg;">
+
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <Label text="TOURNAMENT BRACKETS" styleClass="page-title"/>
+        <Region HBox.hgrow="ALWAYS" />
+        <ComboBox fx:id="eventSelector" promptText="Select Event" prefWidth="300"/>
+        <Button text="LOAD BRACKET" onAction="#loadBracket" styleClass="button, btn-primary"/>
+    </HBox>
+
+    <VBox fx:id="bracketContainer" styleClass="content-panel" VBox.vgrow="ALWAYS" alignment="CENTER" spacing="20">
+        <Label text="Select an event to view or generate a bracket." style="-fx-text-fill: -fx-text-secondary; -fx-font-size: 16px;"/>
+    </VBox>
+
+</VBox>
