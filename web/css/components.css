@@ -6,6 +6,7 @@
   align-items: center;
   min-height: 80vh;
   padding-top: 2rem;
+  padding-bottom: 4rem;
 }
 
 .hero-content .label {
@@ -404,6 +405,7 @@
     grid-template-columns: 1fr;
     gap: 2rem;
     padding-top: 1rem;
+    padding-bottom: 3rem;
     text-align: center;
   }
   .hero-content p {
