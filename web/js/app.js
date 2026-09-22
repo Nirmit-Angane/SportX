@@ -1,6 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
     loadHomepageData();
+    // Poll for live matches every 3 seconds to keep scores updated
+    setInterval(pollLiveMatches, 3000);
 });
+
+async function pollLiveMatches() {
+    try {
+        const matchesRes = await fetchAPI('/matches');
+        if (matchesRes.success) {
+            const matches = matchesRes.data;
+            renderHeroLive(matches);
+            renderLiveRail(matches);
+        }
+    } catch (error) {
+        console.error("Error polling matches", error);
+    }
+}
 
 async function loadHomepageData() {
     try {

@@ -391,3 +391,82 @@
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .hero-section {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-top: 1rem;
+    text-align: center;
+  }
+  .hero-content p {
+    margin: 0 auto 2rem;
+  }
+  .hero-actions {
+    justify-content: center;
+  }
+  .hero-scoreboard {
+    padding: 1.5rem;
+  }
+  .hero-scoreboard-body {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  .hero-team.home, .hero-team.away {
+    text-align: center !important;
+  }
+  .hero-score-wrapper {
+    justify-content: center;
+    margin: 1rem 0;
+  }
+  .hero-score-value {
+    font-size: 3rem;
+  }
+  .tournament-feature {
+    padding: 2rem 1rem;
+  }
+  .tournament-title {
+    font-size: 2rem;
+  }
+  .tournament-stats {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .fixture-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  .f-team.home, .f-team.away {
+    text-align: center !important;
+    padding: 0 !important;
+  }
+  .f-action {
+    text-align: center;
+    margin-top: 0.5rem;
+  }
+  .mc-score-grid {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .mc-team {
+    width: 100%;
+    text-align: center !important;
+    font-size: 2rem;
+  }
+  .mc-score-num {
+    font-size: 4rem;
+  }
+  .mc-divider {
+    font-size: 2rem;
+  }
+  .mc-tabs {
+    flex-direction: column;
+    gap: 0;
+  }
+  .mc-tab {
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+  }
+}

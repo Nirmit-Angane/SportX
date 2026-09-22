@@ -56,7 +56,7 @@ npx http-server -p 3000
 ### 4. Start the Admin Client
 ```bash
 cd admin
-mvn clean javafx:run
+.\mvnw clean javafx:run
 ```
 *Alternatively, you can open the `admin` folder in IntelliJ IDEA or Eclipse and run `com.sportx.Main`.*
 
