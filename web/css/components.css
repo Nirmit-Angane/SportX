@@ -379,6 +379,12 @@
   color: var(--text-secondary);
 }
 
+.teams-grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
 /* Skeletons */
 .skeleton {
   background: linear-gradient(90deg, var(--surface) 25%, var(--surface-elevated) 50%, var(--surface) 75%);
@@ -468,5 +474,12 @@
   .mc-tab {
     text-align: center;
     border-bottom: 1px solid var(--border-color);
+  }
+  .teams-grid-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .empty-state {
+    padding: 2rem 1rem;
   }
 }

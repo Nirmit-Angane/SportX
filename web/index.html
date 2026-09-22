@@ -68,8 +68,7 @@
         </div>
     </section>
 
-    <!-- Layout Grid for Up Next & Results -->
-    <section class="section container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;">
+    <section class="section container layout-split">
         <!-- SECTION 04: Upcoming Matches -->
         <div>
             <h2 class="section-header">UP NEXT</h2>
@@ -100,7 +99,7 @@
         <h2 class="section-header">TEAMS IN THE SPOTLIGHT</h2>
         <p class="section-subtitle">Top competing teams.</p>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 2rem;" id="teams-grid">
+        <div class="teams-grid-layout" id="teams-grid">
             <!-- Populated by JS -->
             <div class="skeleton" style="height: 150px; border-radius: var(--radius-md);"></div>
             <div class="skeleton" style="height: 150px; border-radius: var(--radius-md);"></div>

@@ -170,6 +170,12 @@ h1, h2, h3, h4, h5, h6 {
   padding: 1.5rem;
 }
 
+.layout-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+}
+
 /* Utility */
 .section {
   padding: 4rem 0;
@@ -270,4 +276,8 @@ h1, h2, h3, h4, h5, h6 {
   .nav-links { display: none; }
   .footer-content { grid-template-columns: 1fr; }
   .section { padding: 2rem 0; }
+  .layout-split { 
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
 }
