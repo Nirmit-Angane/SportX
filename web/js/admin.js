@@ -6,16 +6,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    const userInfo = document.getElementById('user-info');
+    if (userInfo && meRes.data && meRes.data.user) {
+        userInfo.innerText = meRes.data.user.username;
+    }
+
     lucide.createIcons();
+    
+    // Add event listeners to tabs
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+            switchAdminTab(btn.getAttribute('data-target'));
+        });
+    });
+
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logoutAdmin);
+    }
+
     switchAdminTab('dashboard');
 });
 
 function switchAdminTab(tabId) {
-    document.querySelectorAll('.mc-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.section-view').forEach(s => s.style.display = 'none');
+    document.querySelectorAll('.nav-item').forEach(t => {
+        t.classList.remove('active', 'btn-primary');
+        t.classList.add('btn-secondary');
+    });
+    document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
     
-    document.querySelector(`.mc-tab[onclick="switchAdminTab('${tabId}')"]`).classList.add('active');
-    document.getElementById(`view-${tabId}`).style.display = 'block';
+    const targetBtn = document.querySelector(`.nav-item[data-target="${tabId}"]`);
+    if (targetBtn) {
+        targetBtn.classList.add('active', 'btn-primary');
+        targetBtn.classList.remove('btn-secondary');
+    }
+    
+    const targetView = document.getElementById(`view-${tabId}`);
+    if (targetView) targetView.classList.add('active');
+    
+    const title = document.getElementById('page-title');
+    if (title) title.innerText = tabId.replace('-', ' ').toUpperCase();
 
     if (tabId === 'dashboard') loadDashboard();
     else if (tabId === 'matches') loadMatches();
@@ -37,17 +67,20 @@ async function loadDashboard() {
         }
         if (matchesRes.success) {
             const live = matchesRes.data.filter(m => m.status === 'LIVE').length;
-            document.getElementById('stat-live-matches').innerText = live;
+            const liveStat = document.getElementById('stat-live');
+            if (liveStat) liveStat.innerText = live;
             
-            const tbody = document.getElementById('recent-matches-body');
-            tbody.innerHTML = matchesRes.data.slice(0, 5).map(m => `
-                <div class="table-row">
-                    <div class="col" style="flex: 1;">${m.start_time ? m.start_time.substring(0,10) : 'TBA'}</div>
-                    <div class="col" style="flex: 3;">${m.home_team_name} vs ${m.away_team_name}</div>
-                    <div class="col" style="flex: 1;">${m.status}</div>
-                    <div class="col" style="flex: 1;"><a href="pages/match.html?id=${m.id}" class="text-blue">View</a></div>
-                </div>
+            const tbody = document.getElementById('dashboard-recent-matches');
+            if (tbody) {
+                tbody.innerHTML = matchesRes.data.slice(0, 5).map(m => `
+                <tr>
+                    <td>${m.start_time ? m.start_time.substring(0,10) : 'TBA'}</td>
+                    <td>${m.home_team_name} vs ${m.away_team_name}</td>
+                    <td>${m.status}</td>
+                    <td><a href="pages/match.html?id=${m.id}" class="text-blue">View</a></td>
+                </tr>
             `).join('');
+            }
         }
     } catch (e) {
         console.error(e);
