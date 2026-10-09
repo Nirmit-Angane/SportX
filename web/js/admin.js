@@ -51,6 +51,7 @@ function switchAdminTab(tabId) {
     else if (tabId === 'matches') loadMatches();
     else if (tabId === 'events') loadEvents();
     else if (tabId === 'teams') loadTeams();
+    else if (tabId === 'brackets') loadBrackets();
 }
 
 async function loadDashboard() {
@@ -145,3 +146,75 @@ async function logoutAdmin() {
     await fetchAPI('/auth/logout', { method: 'POST' });
     window.location.href = 'login.html';
 }
+
+async function loadBrackets() {
+    const res = await fetchAPI('/events');
+    const select = document.getElementById('admin-bracket-event');
+    if (res.success && select) {
+        select.innerHTML = '<option value="">-- Select Event --</option>' + 
+            res.data.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+    }
+}
+
+async function loadAdminBracket(eventId) {
+    if (!eventId) {
+        document.getElementById('admin-bracket-view').style.display = 'none';
+        document.getElementById('admin-no-bracket').style.display = 'none';
+        return;
+    }
+    
+    const res = await fetchAPI('/matches');
+    if (res.success) {
+        const matches = res.data.filter(m => m.event_id == eventId && m.round && m.round.startsWith('Bracket:'));
+        
+        if (matches.length > 0) {
+            document.getElementById('admin-no-bracket').style.display = 'none';
+            document.getElementById('admin-bracket-view').style.display = 'block';
+            
+            const qf1 = matches.find(m => m.round === 'Bracket: QF 1');
+            const qf2 = matches.find(m => m.round === 'Bracket: QF 2');
+            const qf3 = matches.find(m => m.round === 'Bracket: QF 3');
+            const qf4 = matches.find(m => m.round === 'Bracket: QF 4');
+            const sf1 = matches.find(m => m.round === 'Bracket: SF 1');
+            const sf2 = matches.find(m => m.round === 'Bracket: SF 2');
+            const finalMatch = matches.find(m => m.round === 'Bracket: Final');
+            
+            const renderMatch = (m) => {
+                if (!m) return '<div>TBD vs TBD</div>';
+                return `<div style="font-weight: bold; color: var(--white);">${m.home_team_name || 'TBD'} vs ${m.away_team_name || 'TBD'}</div>
+                        <div style="font-size: 0.85rem; color: var(--accent); margin-top: 4px;">${m.status}</div>`;
+            };
+            
+            document.getElementById('admin-qf1').innerHTML = renderMatch(qf1);
+            document.getElementById('admin-qf2').innerHTML = renderMatch(qf2);
+            document.getElementById('admin-qf3').innerHTML = renderMatch(qf3);
+            document.getElementById('admin-qf4').innerHTML = renderMatch(qf4);
+            document.getElementById('admin-sf1').innerHTML = renderMatch(sf1);
+            document.getElementById('admin-sf2').innerHTML = renderMatch(sf2);
+            document.getElementById('admin-final').innerHTML = renderMatch(finalMatch);
+            
+        } else {
+            document.getElementById('admin-bracket-view').style.display = 'none';
+            document.getElementById('admin-no-bracket').style.display = 'block';
+        }
+    }
+}
+
+async function generateBracket() {
+    const eventId = document.getElementById('admin-bracket-event').value;
+    if (!eventId) return alert("Please select an event first.");
+    
+    if (confirm("Are you sure? This will delete any existing brackets for this event!")) {
+        const res = await fetchAPI('/matches/generate-bracket', {
+            method: 'POST',
+            body: JSON.stringify({ event_id: eventId })
+        });
+        if (res.success) {
+            alert("Bracket generated successfully!");
+            loadAdminBracket(eventId);
+        } else {
+            alert("Error: " + res.message);
+        }
+    }
+}
+
