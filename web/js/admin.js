@@ -1,6 +1,7 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Check if token exists, if not redirect to login
-    if (!localStorage.getItem('admin_token')) {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Check if authenticated
+    const meRes = await fetchAPI('/auth/me');
+    if (!meRes.success) {
         window.location.href = 'login.html';
         return;
     }
@@ -107,7 +108,7 @@ async function loadMatches() {
     }
 }
 
-function logoutAdmin() {
-    localStorage.removeItem('admin_token');
+async function logoutAdmin() {
+    await fetchAPI('/auth/logout', { method: 'POST' });
     window.location.href = 'login.html';
 }
