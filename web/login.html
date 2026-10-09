@@ -4,26 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPORTX | Admin Login</title>
-    <link rel="stylesheet" href="css/style.css?v=1791546766">
-    <link rel="stylesheet" href="css/components.css?v=1791546766">
+    <link rel="stylesheet" href="css/style.css?v=1791565995">
+    <link rel="stylesheet" href="css/components.css?v=1791565995">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
     <!-- Top Status Bar -->
-        <nav class="navbar">
-        <div class="container">
-            <a href="index.html?v=1791546347" class="brand">SPORTX</a>
-            <div class="nav-links">
-                <a href="index.html?v=1791546347">HOME</a>
-                <a href="pages/events.html?v=1791546347">EVENTS</a>
-                <a href="pages/matches.html?v=1791546347">MATCHES</a>
-                <a href="pages/brackets.html?v=1791546347">BRACKETS</a>
-                <a href="pages/teams.html?v=1791546347">TEAMS</a>
-                <a href="pages/register.html?v=1791546347">REGISTER</a>
-                <a href="login.html?v=1791546347" class="active">ADMIN</a>
+            <nav class="status-bar navbar">
+        <div class="container sb-container">
+            <a href="index.html" class="sb-brand brand">SPORTX</a>
+            <div class="sb-nav nav-links">
+                <a href="index.html">Home</a>
+                <a href="pages/events.html">Events</a>
+                <a href="pages/matches.html">Matches</a>
+                <a href="pages/brackets.html">Brackets</a>
+                <a href="pages/teams.html">Teams</a>
+                <a href="pages/register.html">Register</a>
+                <a href="login.html">Admin</a>
             </div>
-            <div class="nav-actions">
-                <button class="btn btn-secondary" style="padding: 0.5rem;"><i data-lucide="search"></i></button>
+            <div class="sb-right nav-actions">
+                <button class="btn-icon"><i data-lucide="search"></i></button>
+                <div class="live-clock">LIVE &middot; <span id="global-clock">00:00:00</span></div>
             </div>
         </div>
     </nav>
@@ -84,9 +85,9 @@
         </div>
     </footer>
 
-    <script src="js/ui.js?v=1791546766"></script>
-    <script src="js/config.js?v=1791546766"></script>
-    <script src="js/api.js?v=1791546766"></script>
+    <script src="js/ui.js?v=1791565995"></script>
+    <script src="js/config.js?v=1791565995"></script>
+    <script src="js/api.js?v=1791565995"></script>
     <script>
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();

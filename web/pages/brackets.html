@@ -4,26 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tournament Brackets | SPORTX</title>
-    <link rel="stylesheet" href="../css/style.css?v=1791546766">
-    <link rel="stylesheet" href="../css/components.css?v=1791546766">
-    <link rel="stylesheet" href="../css/bracket.css?v=1791546766">
+    <link rel="stylesheet" href="../css/style.css?v=1791565995">
+    <link rel="stylesheet" href="../css/components.css?v=1791565995">
+    <link rel="stylesheet" href="../css/bracket.css?v=1791565995">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="container">
-            <a href="../index.html?v=1791546347" class="brand">SPORTX</a>
-            <div class="nav-links">
-                <a href="../index.html?v=1791546347">Home</a>
-                <a href="events.html?v=1791546347">Events</a>
-                <a href="matches.html?v=1791546347">Matches</a>
-                <a href="brackets.html?v=1791546347" class="active">Brackets</a>
-                <a href="teams.html?v=1791546347">Teams</a>
-                <a href="register.html?v=1791546347">Register</a>
-                <a href="../login.html?v=1791546347">Admin</a>
+        <nav class="status-bar navbar">
+        <div class="container sb-container">
+            <a href="../index.html" class="sb-brand brand">SPORTX</a>
+            <div class="sb-nav nav-links">
+                <a href="../index.html">Home</a>
+                <a href="events.html">Events</a>
+                <a href="matches.html">Matches</a>
+                <a href="brackets.html" class="active">Brackets</a>
+                <a href="teams.html">Teams</a>
+                <a href="register.html">Register</a>
+                <a href="../login.html">Admin</a>
             </div>
-            <div class="nav-actions">
-                <button class="btn btn-secondary" style="padding: 0.5rem;"><i data-lucide="search"></i></button>
+            <div class="sb-right nav-actions">
+                <button class="btn-icon"><i data-lucide="search"></i></button>
+                <div class="live-clock">LIVE &middot; <span id="global-clock">00:00:00</span></div>
             </div>
         </div>
     </nav>
@@ -37,7 +38,7 @@
             </select>
         </div>
 
-        <div id="bracket-view" style="display: none; background: var(--surface-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color);">
+        <div id="bracket-view" style="display: none; background: var(--ink-2); padding: 2rem; border: var(--border-xl) solid var(--ink); border-radius: 0;">
             <div class="bracket-container" id="bracket-container" style="gap: 50px;">
                 <!-- Quarter Finals -->
                 <div class="bracket-round">
@@ -70,17 +71,19 @@
         </div>
     </div>
 
-    <script src="../js/api.js?v=1791546766"></script>
+    <script src="../js/api.js?v=1791565995"></script>
     <script>
         lucide.createIcons();
 
         document.addEventListener('DOMContentLoaded', async () => {
             const res = await fetchAPI('/events');
-            if (res.success) {
+            if (res.success && res.data.length > 0) {
                 const select = document.getElementById('event-select');
                 res.data.forEach(e => {
                     select.innerHTML += `<option value="${e.id}">${e.name}</option>`;
                 });
+                select.value = res.data[0].id;
+                loadBracketForEvent(res.data[0].id);
             }
         });
 
@@ -137,6 +140,6 @@
             `;
         }
     </script>
-<script src="../js/ui.js?v=1791546766"></script>
+<script src="../js/ui.js?v=1791565995"></script>
 </body>
 </html>

@@ -4,25 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Events & Tournaments | SPORTX</title>
-    <link rel="stylesheet" href="../css/style.css?v=1791546766">
-    <link rel="stylesheet" href="../css/components.css?v=1791546766">
+    <link rel="stylesheet" href="../css/style.css?v=1791565995">
+    <link rel="stylesheet" href="../css/components.css?v=1791565995">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="container">
-            <a href="../index.html?v=1791546347" class="brand">SPORTX</a>
-            <div class="nav-links">
-                <a href="../index.html?v=1791546347">Home</a>
-                <a href="events.html?v=1791546347" class="active">Events</a>
-                <a href="matches.html?v=1791546347">Matches</a>
-                <a href="brackets.html?v=1791546347">Brackets</a>
-                <a href="teams.html?v=1791546347">Teams</a>
-                <a href="register.html?v=1791546347">Register</a>
-                <a href="../login.html?v=1791546347">Admin</a>
+        <nav class="status-bar navbar">
+        <div class="container sb-container">
+            <a href="../index.html" class="sb-brand brand">SPORTX</a>
+            <div class="sb-nav nav-links">
+                <a href="../index.html">Home</a>
+                <a href="events.html" class="active">Events</a>
+                <a href="matches.html">Matches</a>
+                <a href="brackets.html">Brackets</a>
+                <a href="teams.html">Teams</a>
+                <a href="register.html">Register</a>
+                <a href="../login.html">Admin</a>
             </div>
-            <div class="nav-actions">
-                <button class="btn btn-secondary" style="padding: 0.5rem;"><i data-lucide="search"></i></button>
+            <div class="sb-right nav-actions">
+                <button class="btn-icon"><i data-lucide="search"></i></button>
+                <div class="live-clock">LIVE &middot; <span id="global-clock">00:00:00</span></div>
             </div>
         </div>
     </nav>
@@ -36,7 +37,7 @@
         </div>
     </div>
 
-    <script src="../js/api.js?v=1791546766"></script>
+    <script src="../js/api.js?v=1791565995"></script>
     <script>
         lucide.createIcons();
 
@@ -49,21 +50,26 @@
                     gridEl.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;"><h3>NO EVENTS</h3><p>There are currently no active tournaments.</p></div>`;
                     return;
                 }
-                gridEl.innerHTML = res.data.map(event => `
-                    <div class="card" style="position: relative; overflow: hidden;">
-                        <div style="position: absolute; top: -20px; right: -20px; font-size: 10rem; opacity: 0.03; font-family: var(--font-display); pointer-events: none;">${event.name.charAt(0)}</div>
-                        <h3 style="font-size: 1.5rem; color: var(--brand-blue); margin-bottom: 1rem; position: relative;">${event.name}</h3>
-                        <p class="text-muted" style="margin-bottom: 0.5rem;"><i data-lucide="map-pin" style="width: 16px; height: 16px; vertical-align: middle;"></i> ${event.location || 'TBA'}</p>
-                        <p class="text-muted" style="margin-bottom: 2rem;"><i data-lucide="calendar" style="width: 16px; height: 16px; vertical-align: middle;"></i> ${event.start_date ? event.start_date.substring(0,10) : 'TBA'} - ${event.end_date ? event.end_date.substring(0,10) : 'TBA'}</p>
-                        <a href="matches.html?event_id=${event.id}" class="btn btn-secondary" style="width: 100%;">VIEW MATCHES</a>
-                    </div>
-                `).join('');
+                
+gridEl.innerHTML = res.data.map(event => `
+    <a href="matches.html?event_id=${event.id}" class="team-card team-pattern-7" style="position: relative; display: flex; flex-direction: column;">
+        <div class="team-badge" style="font-size: 2rem; border-color: var(--accent);">
+            ${event.name.charAt(0)}
+            <div class="badge-pattern"></div>
+        </div>
+        <div class="team-name" style="margin-bottom: 0.5rem; font-size: 1.25rem;">${event.name}</div>
+        <div class="team-stats" style="margin-bottom: 0.5rem;">${event.location || 'TBA'}</div>
+        <div class="team-stats" style="margin-bottom: 1.5rem; color: var(--accent);">${event.start_date ? event.start_date.substring(0,10) : 'TBA'}</div>
+        <button class="btn btn-primary" style="color: var(--ink); margin-top: auto; width: 100%;">VIEW MATCHES</button>
+    </a>
+`).join('');
+
                 lucide.createIcons();
             } else {
                 gridEl.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;">Failed to load events.</div>';
             }
         });
     </script>
-<script src="../js/ui.js?v=1791546766"></script>
+<script src="../js/ui.js?v=1791565995"></script>
 </body>
 </html>

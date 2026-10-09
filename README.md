@@ -59,8 +59,8 @@ npx http-server -p 3000
 The admin dashboard is now part of the web application.
 1. Navigate to `http://localhost:3000/login.html`
 2. Login with the new default credentials:
-   - Username: `nirmit`
-   - Password: `2019`
+   - Username: `admin`
+   - Password: `admin123`
 
 *(The legacy JavaFX app in `admin/` is deprecated. If you still wish to run it for reference: `cd admin` and `.\mvnw clean javafx:run`)*
 

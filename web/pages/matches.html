@@ -4,25 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Match Schedule | SPORTX</title>
-    <link rel="stylesheet" href="../css/style.css?v=1791546766">
-    <link rel="stylesheet" href="../css/components.css?v=1791546766">
+    <link rel="stylesheet" href="../css/style.css?v=1791565995">
+    <link rel="stylesheet" href="../css/components.css?v=1791565995">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="container">
-            <a href="../index.html?v=1791546347" class="brand">SPORTX</a>
-            <div class="nav-links">
-                <a href="../index.html?v=1791546347">Home</a>
-                <a href="events.html?v=1791546347">Events</a>
-                <a href="matches.html?v=1791546347" class="active">Matches</a>
-                <a href="brackets.html?v=1791546347">Brackets</a>
-                <a href="teams.html?v=1791546347">Teams</a>
-                <a href="register.html?v=1791546347">Register</a>
-                <a href="../login.html?v=1791546347">Admin</a>
+        <nav class="status-bar navbar">
+        <div class="container sb-container">
+            <a href="../index.html" class="sb-brand brand">SPORTX</a>
+            <div class="sb-nav nav-links">
+                <a href="../index.html">Home</a>
+                <a href="events.html">Events</a>
+                <a href="matches.html" class="active">Matches</a>
+                <a href="brackets.html">Brackets</a>
+                <a href="teams.html">Teams</a>
+                <a href="register.html">Register</a>
+                <a href="../login.html">Admin</a>
             </div>
-            <div class="nav-actions">
-                <button class="btn btn-secondary" style="padding: 0.5rem;"><i data-lucide="search"></i></button>
+            <div class="sb-right nav-actions">
+                <button class="btn-icon"><i data-lucide="search"></i></button>
+                <div class="live-clock">LIVE &middot; <span id="global-clock">00:00:00</span></div>
             </div>
         </div>
     </nav>
@@ -44,7 +45,7 @@
         </div>
     </div>
 
-    <script src="../js/api.js?v=1791546766"></script>
+    <script src="../js/api.js?v=1791565995"></script>
     <script>
         lucide.createIcons();
         let allMatches = [];
@@ -81,17 +82,16 @@
                 const isLive = match.status === 'LIVE';
                 
                 return `
-                <a href="match.html?id=${match.id}" class="fixture-row" style="${isLive ? 'border-left: 4px solid var(--accent-red);' : ''}">
-                    <div class="f-time">${isLive ? '<span class="text-red">LIVE</span>' : (match.status === 'COMPLETED' ? 'FT' : (match.match_time ? match.match_time.substring(0,5) : 'TBA'))}</div>
-                    <div class="f-team home" style="${homeWin && match.status === 'COMPLETED' ? 'color: var(--brand-blue);' : ''}">${match.home_team_name}</div>
-                    <div class="f-vs-score" style="${isLive ? 'color: var(--accent-red); border: 1px solid var(--accent-red);' : ''}">${match.status === 'SCHEDULED' ? 'VS' : `${match.home_score} - ${match.away_score}`}</div>
-                    <div class="f-team away" style="${awayWin && match.status === 'COMPLETED' ? 'color: var(--brand-blue);' : ''}">${match.away_team_name}</div>
-                    <div class="f-tournament">${match.round || 'MATCH'}</div>
-                    <div class="f-action">VIEW →</div>
+                <a href="match.html?id=${match.id}" class="fixture-row" style="${isLive ? 'border-left: 4px solid var(--accent);' : ''}">
+                    <div class="f-time">${isLive ? '<span class="tag tag-accent">LIVE</span>' : (match.status === 'COMPLETED' ? 'FT' : (match.match_time ? match.match_time.substring(0,5) : 'TBA'))}</div>
+                    <div class="f-team home ${homeWin && match.status === 'COMPLETED' ? 'winner' : ''}">${match.home_team_name}</div>
+                    <div class="f-vs-score" style="${isLive ? 'color: var(--ink); background: var(--accent);' : ''}">${match.status === 'SCHEDULED' ? 'VS' : `${match.home_score} - ${match.away_score}`}</div>
+                    <div class="f-team away ${awayWin && match.status === 'COMPLETED' ? 'winner' : ''}">${match.away_team_name}</div>
+                    <div class="f-action"><span class="tag tag-accent">VIEW</span></div>
                 </a>
             `}).join('');
         }
     </script>
-<script src="../js/ui.js?v=1791546766"></script>
+<script src="../js/ui.js?v=1791565995"></script>
 </body>
 </html>
