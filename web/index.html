@@ -4,140 +4,179 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPORTX | Live Sports Network</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/components.css">
-    <!-- Lucide Icons -->
+    <link rel="stylesheet" href="css/style.css?v=1791546766">
+    <link rel="stylesheet" href="css/components.css?v=1791546766">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="container">
-            <a href="index.html" class="brand">SPORTX</a>
-            <div class="nav-links">
-                <a href="index.html" class="active">Home</a>
-                <a href="pages/events.html">Events</a>
-                <a href="pages/matches.html">Matches</a>
-                <a href="pages/brackets.html">Brackets</a>
-                <a href="pages/teams.html">Teams</a>
-                <a href="pages/standings.html">Standings</a>
+    <!-- 1. Status Bar -->
+    <nav class="status-bar navbar">
+        <div class="container sb-container">
+            <a href="index.html?v=1791546347" class="sb-brand brand">SPORTX</a>
+            <div class="sb-nav nav-links">
+                <a href="index.html?v=1791546347" class="active">Home</a>
+                <a href="pages/events.html?v=1791546347">Events</a>
+                <a href="pages/matches.html?v=1791546347">Matches</a>
+                <a href="pages/brackets.html?v=1791546347">Brackets</a>
+                <a href="pages/teams.html?v=1791546347">Teams</a>
+                <a href="pages/register.html?v=1791546347">Register</a>
+                <a href="login.html?v=1791546347">Admin</a>
             </div>
-            <div class="nav-actions">
-                <button class="btn btn-secondary" style="padding: 0.5rem;"><i data-lucide="search"></i></button>
+            <div class="sb-right nav-actions">
+                <button class="btn-icon"><i data-lucide="search"></i></button>
+                <div class="live-clock">LIVE &middot; <span id="global-clock">00:00:00</span></div>
             </div>
         </div>
     </nav>
 
-    <!-- SECTION 01: Hero -->
-    <section class="container hero-section">
-        <div class="hero-content">
-            <span class="label">SPORTX / LIVE SPORTS NETWORK</span>
-            <h1>LIVE SPORTS.<br><span class="text-brand">ONE PLATFORM.</span></h1>
-            <p>Follow live matches, tournaments, teams, results and standings from one unified premium platform.</p>
-            <div class="hero-actions">
-                <a href="#live-now" class="btn btn-primary">VIEW LIVE MATCHES</a>
-                <a href="pages/events.html" class="btn btn-secondary">EXPLORE EVENTS</a>
+    <!-- 2. Hero Section (Ink) -->
+    <section class="hero-section">
+        <div class="slant-panel"></div>
+        <div class="ghost-numeral" aria-hidden="true" id="hero-ghost">00</div>
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <span class="label">SPORTX / LIVE SPORTS NETWORK</span>
+                <h1>LIVE SPORTS.<br><span class="text-brand">ONE PLATFORM.</span></h1>
+                <p>Follow live matches, tournaments, teams, results and standings from one unified premium platform.</p>
+                <div class="hero-actions">
+                    <a href="#live-now" class="btn btn-primary">VIEW LIVE MATCHES</a>
+                    <a href="pages/events.html?v=1791546347" class="btn btn-secondary">EXPLORE EVENTS</a>
+                </div>
             </div>
-        </div>
-        
-        <div class="hero-scoreboard" id="hero-live-feature">
-            <!-- Populated by JS -->
-            <div class="skeleton" style="height: 300px; border-radius: var(--radius-lg);"></div>
+            <div id="hero-live-feature" class="hero-right">
+                <!-- JS will inject split card here -->
+            </div>
         </div>
     </section>
 
-    <!-- SECTION 02: Live Now -->
-    <section class="section" id="live-now" style="background: var(--surface-elevated); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+    <!-- 3. Live Tape (Paper Strip) -->
+    <div class="live-tape-wrapper" id="live-tape-wrapper" style="display: none;">
+        <div class="live-tape" id="live-tape">
+            <!-- JS will inject scrolling content -->
+        </div>
+    </div>
+
+    <!-- 4. Live Now (Ink) -->
+    <section class="section ink-band" id="live-now">
         <div class="container">
-            <h2 class="section-header">LIVE NOW</h2>
-            <p class="section-subtitle">Matches happening right now across all tournaments.</p>
-            
-            <div class="live-rail" id="live-matches-rail">
-                <!-- Populated by JS -->
-                <div class="skeleton card-live" style="height: 180px;"></div>
-                <div class="skeleton card-live" style="height: 180px;"></div>
-                <div class="skeleton card-live" style="height: 180px;"></div>
+            <div class="section-header-comp on-ink">
+                <div class="sh-label">01 / FIXTURES</div>
+                <div class="sh-row">
+                    <h2 class="sh-title">LIVE NOW</h2>
+                    <div class="sh-rule"></div>
+                    <a href="pages/matches.html?v=1791546347" class="tag sh-link"><span>VIEW ALL</span></a>
+                </div>
+            </div>
+            <div id="live-matches-rail">
+                <!-- JS injected -->
             </div>
         </div>
     </section>
+    
+    <div class="band-divider accent-rule"></div>
 
-    <!-- SECTION 03: Featured Tournament -->
-    <section class="section container">
-        <div class="tournament-feature" id="featured-tournament">
-            <!-- Populated by JS -->
-            <div class="skeleton" style="height: 300px; border-radius: var(--radius-lg);"></div>
-        </div>
-    </section>
-
-    <section class="section container layout-split">
-        <!-- SECTION 04: Upcoming Matches -->
-        <div>
-            <h2 class="section-header">UP NEXT</h2>
-            <p class="section-subtitle">Upcoming fixtures across the network.</p>
-            <div class="fixture-list" id="upcoming-matches">
-                <div class="skeleton" style="height: 80px; margin-bottom: 1rem;"></div>
-                <div class="skeleton" style="height: 80px; margin-bottom: 1rem;"></div>
-                <div class="skeleton" style="height: 80px; margin-bottom: 1rem;"></div>
-            </div>
-            <a href="pages/matches.html" class="btn btn-secondary" style="width: 100%; margin-top: 2rem;">ALL UPCOMING →</a>
-        </div>
-
-        <!-- SECTION 05: Recent Results -->
-        <div>
-            <h2 class="section-header">LATEST RESULTS</h2>
-            <p class="section-subtitle">Completed matches and final scores.</p>
-            <div class="fixture-list" id="recent-results">
-                <div class="skeleton" style="height: 80px; margin-bottom: 1rem;"></div>
-                <div class="skeleton" style="height: 80px; margin-bottom: 1rem;"></div>
-                <div class="skeleton" style="height: 80px; margin-bottom: 1rem;"></div>
-            </div>
-            <a href="pages/matches.html" class="btn btn-secondary" style="width: 100%; margin-top: 2rem;">ALL RESULTS →</a>
-        </div>
-    </section>
-
-    <!-- SECTION 07: Teams -->
-    <section class="section container">
-        <h2 class="section-header">TEAMS IN THE SPOTLIGHT</h2>
-        <p class="section-subtitle">Top competing teams.</p>
-        
-        <div class="teams-grid-layout" id="teams-grid">
-            <!-- Populated by JS -->
-            <div class="skeleton" style="height: 150px; border-radius: var(--radius-md);"></div>
-            <div class="skeleton" style="height: 150px; border-radius: var(--radius-md);"></div>
-            <div class="skeleton" style="height: 150px; border-radius: var(--radius-md);"></div>
-            <div class="skeleton" style="height: 150px; border-radius: var(--radius-md);"></div>
-        </div>
-    </section>
-
-    <!-- SECTION 09: Final CTA -->
-    <section class="section" style="text-align: center; padding: 8rem 0; border-top: 1px dashed var(--border-color); margin-top: 4rem;">
+    <!-- 5. Featured Tournament (Ink) -->
+    <section class="section ink-band">
         <div class="container">
-            <h2 style="font-size: 4rem; line-height: 1.1; margin-bottom: 2rem;">EVERY MATCH.<br>EVERY RESULT.<br><span class="text-brand">ONE PLATFORM.</span></h2>
-            <a href="pages/matches.html" class="btn btn-primary" style="font-size: 1.5rem; padding: 1rem 3rem;">EXPLORE SPORTX</a>
+            <div class="section-header-comp on-ink">
+                <div class="sh-label">02 / EVENTS</div>
+                <div class="sh-row">
+                    <h2 class="sh-title">FEATURED</h2>
+                    <div class="sh-rule"></div>
+                    <a href="pages/events.html?v=1791546347" class="tag sh-link"><span>VIEW ALL</span></a>
+                </div>
+            </div>
+            <div id="featured-tournament">
+                <!-- JS injected split card -->
+            </div>
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- 6. Up Next + Latest Results (Paper Full-Bleed Band) -->
+    <section class="section ink-2-band">
+        <div class="container layout-split">
+            <!-- UP NEXT -->
+            <div class="list-col">
+                <div class="section-header-comp on-ink-2">
+                    <div class="sh-label">03 / UPCOMING</div>
+                    <div class="sh-row">
+                        <h2 class="sh-title">UP NEXT</h2>
+                        <div class="sh-rule"></div>
+                    </div>
+                </div>
+                <div class="fixture-list" id="upcoming-matches">
+                    <!-- JS injected -->
+                </div>
+                <div class="list-footer">
+                    <a href="pages/matches.html?v=1791546347" class="btn btn-accent">ALL UPCOMING</a>
+                </div>
+            </div>
+
+            <!-- RESULTS -->
+            <div class="list-col">
+                <div class="section-header-comp on-ink-2">
+                    <div class="sh-label">04 / ARCHIVE</div>
+                    <div class="sh-row">
+                        <h2 class="sh-title">RESULTS</h2>
+                        <div class="sh-rule"></div>
+                    </div>
+                </div>
+                <div class="fixture-list" id="recent-results">
+                    <!-- JS injected -->
+                </div>
+                <div class="list-footer">
+                    <a href="pages/matches.html?v=1791546347" class="btn btn-accent">ALL RESULTS</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. Teams (Ink) -->
+    <section class="section ink-band">
+        <div class="container">
+            <div class="section-header-comp on-ink">
+                <div class="sh-label">05 / DIRECTORY</div>
+                <div class="sh-row">
+                    <h2 class="sh-title">TEAMS</h2>
+                    <div class="sh-rule"></div>
+                    <a href="pages/teams.html?v=1791546347" class="tag sh-link"><span>VIEW ALL</span></a>
+                </div>
+            </div>
+            <div class="teams-grid-layout" id="teams-grid">
+                <!-- JS injected -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. CTA Band (Accent Full-Bleed) -->
+    <section class="cta-band section">
+        <div class="container cta-container">
+            <h2 class="cta-title">EVERY MATCH.<br>EVERY RESULT.<br>ONE PLATFORM.</h2>
+            <a href="pages/matches.html?v=1791546347" class="btn btn-accent">EXPLORE SPORTX</a>
+        </div>
+    </section>
+
+    <!-- 9. Footer (Ink) -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
                 <div>
-                    <a href="/" class="brand" style="font-size: 2rem;">SPORTX</a>
+                    <a href="/" class="brand footer-brand">SPORTX</a>
                     <p class="text-muted" style="margin-top: 1rem; max-width: 250px;">LIVE SPORTS. ONE PLATFORM. Experience real-time scores instantly.</p>
                 </div>
                 <div>
-                    <h4 style="margin-bottom: 1.5rem;">Navigation</h4>
+                    <h4 style="margin-bottom: 1.5rem; color: var(--white);">NAVIGATION</h4>
                     <div class="footer-links">
-                        <a href="index.html">Home</a>
-                        <a href="pages/events.html">Events</a>
-                        <a href="pages/matches.html">Matches</a>
-                        <a href="pages/brackets.html">Brackets</a>
-                        <a href="pages/teams.html">Teams</a>
-                        <a href="pages/standings.html">Standings</a>
+                        <a href="index.html?v=1791546347">Home</a>
+                        <a href="pages/events.html?v=1791546347">Events</a>
+                        <a href="pages/matches.html?v=1791546347">Matches</a>
+                        <a href="pages/brackets.html?v=1791546347">Brackets</a>
+                        <a href="pages/teams.html?v=1791546347">Teams</a>
+                        <a href="pages/register.html?v=1791546347">Register</a>
                     </div>
                 </div>
                 <div>
-                    <h4 style="margin-bottom: 1.5rem;">Information</h4>
+                    <h4 style="margin-bottom: 1.5rem; color: var(--white);">INFORMATION</h4>
                     <div class="footer-links">
                         <a href="#">About Us</a>
                         <a href="#">Contact</a>
@@ -147,15 +186,15 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 SPORTX. All rights reserved.</p>
+                <p>&copy; 2026 SPORTX / ALL RIGHTS RESERVED / LIVE SPORTS NETWORK</p>
             </div>
         </div>
     </footer>
 
-    <script src="js/api.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/api.js?v=1791546766"></script>
+    <script src="js/ui.js?v=1791546766"></script>
+    <script src="js/app.js?v=1791546766"></script>
     <script>
-      // Initialize Lucide icons
       lucide.createIcons();
     </script>
 </body>

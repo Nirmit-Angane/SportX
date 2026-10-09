@@ -131,8 +131,79 @@ export const endMatch = async (req: Request, res: Response) => {
     const result = await query(`UPDATE matches SET status = 'COMPLETED' WHERE id = $1 RETURNING *`, [id]);
     if (result.rows.length === 0) return sendError(res, 'Match not found', 404);
     
-    // Also update standings logic here theoretically, but simple version is enough for now.
-    sendSuccess(res, result.rows[0]);
+    const match = result.rows[0];
+    
+    // Auto-advance bracket logic
+    if (match.round && match.round.startsWith('Bracket:')) {
+        const scoreRes = await query(`SELECT home_score, away_score FROM match_scores WHERE match_id = $1`, [id]);
+        if (scoreRes.rows.length > 0) {
+            const { home_score, away_score } = scoreRes.rows[0];
+            let winnerId = null;
+            if (home_score > away_score) winnerId = match.home_team_id;
+            else if (away_score > home_score) winnerId = match.away_team_id;
+            // Fallback for draws - technically shouldn't happen in knockout, but we pick home team as winner to prevent crashes.
+            else winnerId = match.home_team_id; 
+            
+            if (winnerId) {
+                let nextRound = null;
+                let nextSlot = null; // 'home_team_id' or 'away_team_id'
+                
+                if (match.round === 'Bracket: QF 1') { nextRound = 'Bracket: SF 1'; nextSlot = 'home_team_id'; }
+                if (match.round === 'Bracket: QF 2') { nextRound = 'Bracket: SF 1'; nextSlot = 'away_team_id'; }
+                if (match.round === 'Bracket: QF 3') { nextRound = 'Bracket: SF 2'; nextSlot = 'home_team_id'; }
+                if (match.round === 'Bracket: QF 4') { nextRound = 'Bracket: SF 2'; nextSlot = 'away_team_id'; }
+                if (match.round === 'Bracket: SF 1') { nextRound = 'Bracket: Final'; nextSlot = 'home_team_id'; }
+                if (match.round === 'Bracket: SF 2') { nextRound = 'Bracket: Final'; nextSlot = 'away_team_id'; }
+                
+                if (nextRound) {
+                    await query(`UPDATE matches SET ${nextSlot} = $1 WHERE event_id = $2 AND round = $3`, [winnerId, match.event_id, nextRound]);
+                }
+            }
+        }
+    }
+    
+    sendSuccess(res, match);
+  } catch (err: any) {
+    sendError(res, err.message);
+  }
+};
+
+export const generateBracket = async (req: Request, res: Response) => {
+  try {
+    const { event_id } = req.body;
+    
+    const teamsRes = await query(`SELECT id FROM teams WHERE event_id = $1 LIMIT 8`, [event_id]);
+    const teams = teamsRes.rows;
+    if (teams.length < 8) return sendError(res, 'Need at least 8 teams to generate a QF bracket', 400);
+
+    // Delete existing bracket for this event
+    await query(`DELETE FROM matches WHERE event_id = $1 AND round LIKE 'Bracket:%'`, [event_id]);
+
+    const qfRounds = ['Bracket: QF 1', 'Bracket: QF 2', 'Bracket: QF 3', 'Bracket: QF 4'];
+    for (let i = 0; i < 4; i++) {
+        const m = await query(
+            `INSERT INTO matches (event_id, round, status, home_team_id, away_team_id) VALUES ($1, $2, 'SCHEDULED', $3, $4) RETURNING id`,
+            [event_id, qfRounds[i], teams[i*2].id, teams[i*2+1].id]
+        );
+        await query(`INSERT INTO match_scores (match_id) VALUES ($1)`, [m.rows[0].id]);
+    }
+
+    const sfRounds = ['Bracket: SF 1', 'Bracket: SF 2'];
+    for (let i = 0; i < 2; i++) {
+        const m = await query(
+            `INSERT INTO matches (event_id, round, status, home_team_id, away_team_id) VALUES ($1, $2, 'SCHEDULED', NULL, NULL) RETURNING id`,
+            [event_id, sfRounds[i]]
+        );
+        await query(`INSERT INTO match_scores (match_id) VALUES ($1)`, [m.rows[0].id]);
+    }
+
+    const m = await query(
+        `INSERT INTO matches (event_id, round, status, home_team_id, away_team_id) VALUES ($1, 'Bracket: Final', 'SCHEDULED', NULL, NULL) RETURNING id`,
+        [event_id]
+    );
+    await query(`INSERT INTO match_scores (match_id) VALUES ($1)`, [m.rows[0].id]);
+
+    sendSuccess(res, { generated: true });
   } catch (err: any) {
     sendError(res, err.message);
   }

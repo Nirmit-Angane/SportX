@@ -1,5 +1,12 @@
 -- Seed data for SportX
 
+-- Default Admin User (password: 'admin123', hashed with bcrypt)
+-- Hash generated for 'admin123' is $2a$10$32q375wMv3j9D6QeP/5jJ.Zp.kP9P.rL.m1q9sE25t.mO1gE1hP9W
+INSERT INTO users (username, password_hash, role) VALUES 
+('admin', '$2b$10$EpI0Mowc66/h1sI1qM9X/evCjHn24ZJcT.w0sN9P/N.j5R8/iXG8K', 'ADMIN'),
+('operator', '$2b$10$EpI0Mowc66/h1sI1qM9X/evCjHn24ZJcT.w0sN9P/N.j5R8/iXG8K', 'MATCH_OPERATOR'),
+('nirmit', '$2b$10$Tkn7HtGt2IzttAx/tMgmRODguNq43L4/2QHBueH8QFwrheBkVRaam', 'ADMIN');
+
 INSERT INTO sports (name) VALUES 
 ('Football'), 
 ('Basketball'), 

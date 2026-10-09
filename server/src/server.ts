@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 import routes from './routes';
 import { pool } from './db';
 
@@ -8,9 +9,11 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
+const allowedOrigin = process.env.FRONTEND_URL || true;
 
-app.use(cors());
+app.use(cors({ origin: allowedOrigin, credentials: true }));
 app.use(express.json());
+app.use(cookieParser());
 
 // Main router
 app.use('/api', routes);
@@ -19,10 +22,12 @@ app.use('/api', routes);
 pool.connect()
   .then(() => {
     console.log('Connected to PostgreSQL database');
-    app.listen(port, () => {
-      console.log(`Server running on port ${port}`);
-    });
   })
-  .catch((err) => {
-    console.error('Database connection error', err.stack);
+  .catch((err: any) => {
+    console.error('Database connection error:', err.message);
+    console.error('Ensure PostgreSQL is running and credentials are correct.');
   });
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});

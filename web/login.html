@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPORTX | Admin Login</title>
+    <link rel="stylesheet" href="css/style.css?v=1791546766">
+    <link rel="stylesheet" href="css/components.css?v=1791546766">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <!-- Top Status Bar -->
+        <nav class="navbar">
+        <div class="container">
+            <a href="index.html?v=1791546347" class="brand">SPORTX</a>
+            <div class="nav-links">
+                <a href="index.html?v=1791546347">HOME</a>
+                <a href="pages/events.html?v=1791546347">EVENTS</a>
+                <a href="pages/matches.html?v=1791546347">MATCHES</a>
+                <a href="pages/brackets.html?v=1791546347">BRACKETS</a>
+                <a href="pages/teams.html?v=1791546347">TEAMS</a>
+                <a href="pages/register.html?v=1791546347">REGISTER</a>
+                <a href="login.html?v=1791546347" class="active">ADMIN</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn btn-secondary" style="padding: 0.5rem;"><i data-lucide="search"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="ghost-numeral" aria-hidden="true">01</div>
+    <div class="slant-panel"></div>
+
+    <div class="container">
+        <div class="split-card">
+            <div class="split-card-left">
+                <div class="card-label-row">
+                    <span>MEMBER LOGIN</span>
+                    <span class="accent-word">SECURE</span>
+                </div>
+                <div style="color: var(--accent); font-weight: 700; font-size: 1.25rem; margin-bottom: 0.5rem; text-transform: uppercase;">ADMINISTRATION</div>
+                <h1>ACCOUNT ACCESS</h1>
+                <div class="subtitle">Please authenticate to manage tournaments, brackets, and live results.</div>
+                
+                <div class="segment-bar" id="login-progress">
+                    <div class="segment filled"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                </div>
+            </div>
+            
+            <div class="split-card-right">
+                <div class="lane-label">
+                    <span class="text">ACCESS LANE</span>
+                    <span class="numeral">01</span>
+                </div>
+                
+                <div id="error-msg" class="state-error" style="display: none;"></div>
+
+                <form id="login-form">
+                    <div class="form-group">
+                        <label class="form-label" for="username">Username</label>
+                        <input type="text" id="username" class="form-input" required autocomplete="username" placeholder="Enter username">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password</label>
+                        <input type="password" id="password" class="form-input" required autocomplete="current-password" placeholder="Enter password">
+                    </div>
+                    <div style="margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;"><span>LOGIN TO DASHBOARD</span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#">SECURE LANE</a> / 
+            <a href="login.html?v=1791546347">ACCOUNT PORTAL</a> / 
+            <a href="#">PRIVACY</a> / 
+            <a href="#">TERMS</a>
+        </div>
+    </footer>
+
+    <script src="js/ui.js?v=1791546766"></script>
+    <script src="js/config.js?v=1791546766"></script>
+    <script src="js/api.js?v=1791546766"></script>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('error-msg');
+            const btn = document.querySelector('button[type="submit"]');
+
+            btn.disabled = true;
+            btn.querySelector('span').textContent = 'AUTHENTICATING...';
+            errorMsg.style.display = 'none';
+
+            try {
+                const res = await fetchAPI('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (res.success) {
+                    window.location.href = 'admin.html';
+                } else {
+                    errorMsg.textContent = res.message || 'Login failed';
+                    errorMsg.style.display = 'block';
+                }
+            } catch (err) {
+                errorMsg.textContent = 'Network error. Please try again.';
+                errorMsg.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.querySelector('span').textContent = 'LOGIN TO DASHBOARD';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -3,10 +3,11 @@ const API_BASE_URL = 'https://sportx-api-izap.onrender.com/api';
 
 async function fetchAPI(endpoint, options = {}) {
     try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        const response = await fetch(`${window.ENV?.API_BASE_URL || 'http://localhost:5000/api'}${endpoint}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
+            credentials: 'include', // Important for cookies
             ...options
         });
         

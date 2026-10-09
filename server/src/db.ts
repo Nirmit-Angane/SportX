@@ -1,14 +1,29 @@
-import { Pool } from 'pg';
+import { newDb } from 'pg-mem';
+import fs from 'fs';
+import path from 'path';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'postgres',
-  database: process.env.DB_NAME || 'sportx'
-});
+// Create an in-memory database
+const memDb = newDb();
 
+// Read schema and seed files
+const schemaSql = fs.readFileSync(path.join(__dirname, '../../database/schema.sql'), 'utf8');
+const seedSql = fs.readFileSync(path.join(__dirname, '../../database/seed.sql'), 'utf8');
+
+try {
+    // Run schema and seed
+    memDb.public.none(schemaSql);
+    memDb.public.none(seedSql);
+    console.log("In-memory database initialized with schema and seed data!");
+} catch (err: any) {
+    console.error("Error initializing in-memory DB:", err.message);
+}
+
+// Export a connection pool emulator compatible with 'pg'
+const { Pool } = memDb.adapters.createPg();
+export const pool = new Pool();
+
+// Export the query helper
 export const query = (text: string, params?: any[]) => pool.query(text, params);

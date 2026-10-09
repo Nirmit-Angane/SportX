@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPORTX | Register</title>
+    <link rel="stylesheet" href="../css/style.css?v=1791546766">
+    <link rel="stylesheet" href="../css/components.css?v=1791546766">
+    <link rel="stylesheet" href="../css/bracket.css?v=1791546766">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+        <nav class="navbar">
+        <div class="container">
+            <a href="../index.html?v=1791546347" class="brand">SPORTX</a>
+            <div class="nav-links">
+                <a href="../index.html?v=1791546347">HOME</a>
+                <a href="../pages/events.html?v=1791546347">EVENTS</a>
+                <a href="../pages/matches.html?v=1791546347">MATCHES</a>
+                <a href="../pages/brackets.html?v=1791546347">BRACKETS</a>
+                <a href="../pages/teams.html?v=1791546347">TEAMS</a>
+                <a href="../pages/register.html?v=1791546347" class="active">REGISTER</a>
+                <a href="../login.html?v=1791546347" >ADMIN</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn btn-secondary" style="padding: 0.5rem;"><i data-lucide="search"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="ghost-numeral" aria-hidden="true">06</div>
+    <div class="slant-panel"></div>
+
+    <div class="container">
+
+        <div class="split-card">
+            <div class="split-card-left">
+                <div class="card-label-row">
+                    <span>TEAM REGISTRATION</span>
+                    <span class="accent-word">ENROLL</span>
+                </div>
+                <div style="color: var(--accent); font-weight: 700; font-size: 1.25rem; margin-bottom: 0.5rem; text-transform: uppercase;">JOIN THE NETWORK</div>
+                <h1>REGISTER NOW</h1>
+                <div class="subtitle">Sign up your team for an upcoming tournament and get your entry QR code instantly.</div>
+                
+                <div class="segment-bar" id="reg-progress">
+                    <div class="segment filled"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                </div>
+            </div>
+            
+            <div class="split-card-right">
+                <div class="lane-label">
+                    <span class="text">ENTRY LANE</span>
+                    <span class="numeral">06</span>
+                </div>
+                
+                <div id="error-msg" class="state-error" style="display: none;"></div>
+                <div id="success-msg" class="state-success" style="display: none;"></div>
+                
+
+
+                <form id="register-form">
+                    <div class="form-group">
+                        <label class="form-label" for="event-select">Select Tournament</label>
+                        <select id="event-select" class="form-input" required>
+                            <option value="">-- Choose Event --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="team-name">Team Name</label>
+                        <input type="text" id="team-name" class="form-input" required placeholder="e.g. Thunderbolts">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="short-name">Short Name (3 Letters)</label>
+                        <input type="text" id="short-name" class="form-input" required maxlength="3" placeholder="e.g. THU">
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label" for="captain-name">Captain Name</label>
+                            <input type="text" id="captain-name" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="coach-name">Coach Name (Optional)</label>
+                            <input type="text" id="coach-name" class="form-input">
+                        </div>
+                    </div>
+                    <div style="margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;"><span>SUBMIT REGISTRATION</span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    
+    </div>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="../#">SECURE LANE</a> / 
+            <a href="../login.html?v=1791546347">ACCOUNT PORTAL</a> / 
+            <a href="../#">PRIVACY</a> / 
+            <a href="../#">TERMS</a>
+        </div>
+    </footer>
+
+    <script src="../js/ui.js?v=1791546766"></script>
+
+<script src="../js/api.js?v=1791546766"></script>
+<script src="../js/register.js?v=1791546766"></script>
+</body>
+</html>
