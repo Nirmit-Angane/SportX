@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teams Directory | SPORTX</title>
-    <link rel="stylesheet" href="../css/style.css?v=1791703804">
-    <link rel="stylesheet" href="../css/components.css?v=1791703804">
+    <link rel="stylesheet" href="../css/style.css?v=1791741416">
+    <link rel="stylesheet" href="../css/components.css?v=1791741416">
+    <link rel="stylesheet" href="../css/responsive.css?v=1791741416">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
@@ -31,7 +32,7 @@
     <div class="container section">
         <h1 style="font-size: 3rem; margin-bottom: 2rem;">TEAMS DIRECTORY</h1>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 2rem;" id="teams-grid">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 2rem;" id="teams-grid">
             <div class="skeleton" style="height: 250px; border-radius: var(--radius-lg);"></div>
             <div class="skeleton" style="height: 250px; border-radius: var(--radius-lg);"></div>
             <div class="skeleton" style="height: 250px; border-radius: var(--radius-lg);"></div>
@@ -39,8 +40,8 @@
         </div>
     </div>
 
-    <script src="../js/config.js?v=1791703804"></script>
-    <script src="../js/api.js?v=1791703804"></script>
+    <script src="../js/config.js?v=1791741416"></script>
+    <script src="../js/api.js?v=1791741416"></script>
     <script>
         lucide.createIcons();
 
@@ -74,6 +75,6 @@ gridEl.innerHTML = res.data.map((team, index) => {
             }
         });
     </script>
-<script src="../js/ui.js?v=1791703804"></script>
+<script src="../js/ui.js?v=1791741416"></script>
 </body>
 </html>

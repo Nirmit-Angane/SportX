@@ -94,4 +94,96 @@ document.addEventListener('DOMContentLoaded', () => {
         setInterval(update, 1000);
         update();
     }
+
+    // Initialize Mobile Navigation
+    setupMobileNav();
 });
+
+// Setup Mobile Navigation Drawer
+function setupMobileNav() {
+    const sbContainer = document.querySelector('.sb-container');
+    const sbNav = document.querySelector('.sb-nav');
+    if (!sbContainer || !sbNav || document.querySelector('.mobile-nav-toggle')) return;
+
+    // Create hamburger toggle button
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'mobile-nav-toggle';
+    toggleBtn.setAttribute('aria-label', 'Toggle Navigation Menu');
+    toggleBtn.innerHTML = `
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+    `;
+
+    // Append to container
+    sbContainer.appendChild(toggleBtn);
+
+    // Create mobile menu overlay & drawer
+    const drawer = document.createElement('div');
+    drawer.className = 'mobile-nav-drawer';
+    drawer.id = 'mobile-nav-drawer';
+    
+    // Clone navigation links into the drawer
+    const navClone = sbNav.cloneNode(true);
+    navClone.className = 'mobile-drawer-links';
+
+    drawer.innerHTML = `
+        <div class="mobile-drawer-header">
+            <span class="mobile-drawer-brand">SPORTX // MENU</span>
+            <button class="mobile-drawer-close" aria-label="Close Menu">&times;</button>
+        </div>
+    `;
+    drawer.appendChild(navClone);
+
+    // Quick links or status inside drawer
+    const drawerFooter = document.createElement('div');
+    drawerFooter.className = 'mobile-drawer-footer';
+    drawerFooter.innerHTML = `
+        <div class="drawer-live-pill"><span class="live-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:6px;"></span> LIVE SPORTS NETWORK</div>
+    `;
+    drawer.appendChild(drawerFooter);
+
+    // Backdrop
+    const backdrop = document.createElement('div');
+    backdrop.className = 'mobile-nav-backdrop';
+
+    document.body.appendChild(backdrop);
+    document.body.appendChild(drawer);
+
+    const openMenu = () => {
+        drawer.classList.add('open');
+        backdrop.classList.add('open');
+        toggleBtn.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeMenu = () => {
+        drawer.classList.remove('open');
+        backdrop.classList.remove('open');
+        toggleBtn.classList.remove('active');
+        document.body.style.overflow = '';
+    };
+
+    toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (drawer.classList.contains('open')) closeMenu();
+        else openMenu();
+    });
+
+    const closeBtn = drawer.querySelector('.mobile-drawer-close');
+    if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+    backdrop.addEventListener('click', closeMenu);
+
+    // Close when clicking any link inside drawer
+    drawer.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', closeMenu);
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && drawer.classList.contains('open')) {
+            closeMenu();
+        }
+    });
+}
+
