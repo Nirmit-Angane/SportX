@@ -1,6 +1,7 @@
 // Example Configuration file.
-// Copy this to config.js and update with your production URL before deploying.
+// In development, SportX connects to local server on port 5000.
+// In production (Netlify), it automatically routes to Render API.
 
 window.ENV = {
-    API_BASE_URL: 'http://localhost:5000/api'
+    API_BASE_URL: 'https://sportx-api-izap.onrender.com/api'
 };

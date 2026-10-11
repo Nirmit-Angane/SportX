@@ -52,6 +52,7 @@ function switchAdminTab(tabId) {
     else if (tabId === 'events') loadEvents();
     else if (tabId === 'teams') loadTeams();
     else if (tabId === 'brackets') loadBrackets();
+    else if (tabId === 'live-score') loadLiveScoreTab();
 }
 
 async function loadDashboard() {
@@ -144,6 +145,7 @@ async function loadMatches() {
 
 async function logoutAdmin() {
     await fetchAPI('/auth/logout', { method: 'POST' });
+    localStorage.removeItem('sportx_token');
     window.location.href = 'login.html';
 }
 
@@ -217,4 +219,102 @@ async function generateBracket() {
         }
     }
 }
+
+let currentAdminMatch = null;
+
+async function loadLiveScoreTab() {
+    const select = document.getElementById('live-match-select');
+    if (!select) return;
+    
+    const res = await fetchAPI('/matches');
+    if (res.success && res.data) {
+        select.innerHTML = '<option value="">-- Select Match --</option>' + 
+            res.data.map(m => `<option value="${m.id}">[#${m.id}] ${m.home_team_name} vs ${m.away_team_name} (${m.status})</option>`).join('');
+    }
+
+    select.onchange = async () => {
+        const matchId = select.value;
+        const ctrlArea = document.getElementById('score-control-area');
+        if (!matchId) {
+            if (ctrlArea) ctrlArea.style.display = 'none';
+            currentAdminMatch = null;
+            return;
+        }
+
+        const matchRes = await fetchAPI(`/matches/${matchId}`);
+        if (matchRes.success && matchRes.data) {
+            currentAdminMatch = matchRes.data;
+            if (ctrlArea) ctrlArea.style.display = 'block';
+            
+            const homeNameEl = document.getElementById('ctrl-home-team');
+            const awayNameEl = document.getElementById('ctrl-away-team');
+            const homeScoreEl = document.getElementById('ctrl-home-score');
+            const awayScoreEl = document.getElementById('ctrl-away-score');
+            const timerEl = document.getElementById('ctrl-timer');
+
+            if (homeNameEl) homeNameEl.innerText = currentAdminMatch.home_team_name || 'HOME';
+            if (awayNameEl) awayNameEl.innerText = currentAdminMatch.away_team_name || 'AWAY';
+            if (homeScoreEl) homeScoreEl.innerText = currentAdminMatch.home_score !== null ? currentAdminMatch.home_score : 0;
+            if (awayScoreEl) awayScoreEl.innerText = currentAdminMatch.away_score !== null ? currentAdminMatch.away_score : 0;
+            if (timerEl) timerEl.innerText = currentAdminMatch.timer || '00:00';
+        }
+    };
+}
+
+async function updateScore(side, delta) {
+    if (!currentAdminMatch) {
+        alert("Please select a match first.");
+        return;
+    }
+
+    let homeScore = parseInt(document.getElementById('ctrl-home-score').innerText) || 0;
+    let awayScore = parseInt(document.getElementById('ctrl-away-score').innerText) || 0;
+
+    if (side === 'home') {
+        homeScore = Math.max(0, homeScore + delta);
+        document.getElementById('ctrl-home-score').innerText = homeScore;
+    } else if (side === 'away') {
+        awayScore = Math.max(0, awayScore + delta);
+        document.getElementById('ctrl-away-score').innerText = awayScore;
+    }
+
+    const res = await fetchAPI(`/matches/${currentAdminMatch.id}/score`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            home_score: homeScore,
+            away_score: awayScore
+        })
+    });
+
+    if (!res.success) {
+        alert("Failed to update score: " + (res.message || "Unknown error"));
+    }
+}
+
+async function endMatch() {
+    if (!currentAdminMatch) {
+        alert("Please select a match first.");
+        return;
+    }
+
+    if (confirm("Are you sure you want to end this match? This will mark it as COMPLETED and advance bracket winners.")) {
+        const res = await fetchAPI(`/matches/${currentAdminMatch.id}/end`, {
+            method: 'POST'
+        });
+        if (res.success) {
+            alert("Match marked as COMPLETED!");
+            loadLiveScoreTab();
+        } else {
+            alert("Error ending match: " + (res.message || "Unknown error"));
+        }
+    }
+}
+
+window.updateScore = updateScore;
+window.endMatch = endMatch;
+window.generateBracket = generateBracket;
+window.loadAdminBracket = loadAdminBracket;
+window.switchAdminTab = switchAdminTab;
+window.logoutAdmin = logoutAdmin;
+
 

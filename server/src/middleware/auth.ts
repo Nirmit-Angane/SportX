@@ -5,7 +5,9 @@ import { sendError } from '../utils/helpers';
 const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_dev_key';
 
 export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.cookies.token;
+  const authHeader = req.headers.authorization;
+  const bearerToken = authHeader && authHeader.startsWith('Bearer ') ? authHeader.substring(7) : null;
+  const token = req.cookies?.token || bearerToken;
 
   if (!token) {
     return sendError(res, 'Authentication required', 401);

@@ -172,9 +172,13 @@ export const generateBracket = async (req: Request, res: Response) => {
   try {
     const { event_id } = req.body;
     
-    const teamsRes = await query(`SELECT id FROM teams WHERE event_id = $1 LIMIT 8`, [event_id]);
-    const teams = teamsRes.rows;
-    if (teams.length < 8) return sendError(res, 'Need at least 8 teams to generate a QF bracket', 400);
+    let teamsRes = await query(`SELECT id FROM teams WHERE event_id = $1 LIMIT 8`, [event_id]);
+    let teams = teamsRes.rows;
+    if (teams.length < 8) {
+      teamsRes = await query(`SELECT id FROM teams LIMIT 8`);
+      teams = teamsRes.rows;
+    }
+    if (teams.length < 8) return sendError(res, 'Need at least 8 registered teams in the system to generate a QF bracket', 400);
 
     // Delete existing bracket for this event
     await query(`DELETE FROM matches WHERE event_id = $1 AND round LIKE 'Bracket:%'`, [event_id]);

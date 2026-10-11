@@ -57,8 +57,8 @@ npx http-server -p 3000
 The admin dashboard is an integrated secure portal.
 1. Navigate to `http://localhost:3000/login.html`
 2. Login with the default credentials:
-   - Username: `admin` (or `nirmit`)
-   - Password: `admin123` (or `2019`)
+   - Username: `admin` 
+   - Password: `admin123` 
 
 ---
 
