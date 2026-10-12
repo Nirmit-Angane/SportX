@@ -181,7 +181,7 @@ function showNotification(message, type = 'info', title = 'SPORTX LIVE') {
     if (!container) {
         container = document.createElement('div');
         container.id = 'sportx-toast-container';
-        container.style.cssText = 'position: fixed; top: 24px; right: 24px; z-index: 999999; display: flex; flex-direction: column; gap: 12px; pointer-events: none; max-width: 440px; width: calc(100% - 48px);';
+        container.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999999; display: flex; flex-direction: column; gap: 12px; pointer-events: none; max-width: 540px; width: min(92vw, 540px); align-items: center;';
         document.body.appendChild(container);
     }
 
@@ -189,14 +189,16 @@ function showNotification(message, type = 'info', title = 'SPORTX LIVE') {
     toast.style.cssText = `
         background: #03060B;
         border: 2px solid var(--accent, #6EC6FF);
-        box-shadow: 6px 6px 0 var(--accent, #6EC6FF);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 6px 6px 0 var(--accent, #6EC6FF);
         color: #fff;
         padding: 1.1rem 1.35rem;
         font-family: var(--font-display, inherit);
         pointer-events: auto;
-        transform: translateX(120%);
+        transform: translateY(-50px);
         transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
         opacity: 0;
+        width: 100%;
+        box-sizing: border-box;
         position: relative;
     `;
 
@@ -232,7 +234,7 @@ function showNotification(message, type = 'info', title = 'SPORTX LIVE') {
     container.appendChild(toast);
 
     requestAnimationFrame(() => {
-        toast.style.transform = 'translateX(0)';
+        toast.style.transform = 'translateY(0)';
         toast.style.opacity = '1';
     });
 
@@ -243,7 +245,7 @@ function showNotification(message, type = 'info', title = 'SPORTX LIVE') {
 
     // Auto dismiss after 6 seconds
     setTimeout(() => {
-        toast.style.transform = 'translateX(120%)';
+        toast.style.transform = 'translateY(-50px)';
         toast.style.opacity = '0';
         setTimeout(() => toast.remove(), 400);
     }, 6000);

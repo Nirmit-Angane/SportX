@@ -510,30 +510,8 @@ function renderTeams(teams) {
 }
 
 function showNotification(message) {
-    const toast = document.createElement('div');
-    toast.style.position = 'fixed';
-    toast.style.bottom = '20px';
-    toast.style.right = '20px';
-    toast.style.backgroundColor = 'var(--accent)';
-    toast.style.color = 'var(--ink)';
-    toast.style.padding = '1rem 1.5rem';
-    toast.style.border = 'var(--border-xl) solid var(--ink)';
-    toast.style.boxShadow = 'var(--shadow-sm)';
-    toast.style.zIndex = '9999';
-    toast.style.fontFamily = 'var(--font-display)';
-    toast.style.fontWeight = '900';
-    toast.style.fontStyle = 'italic';
-    toast.style.textTransform = 'uppercase';
-    toast.style.display = 'flex';
-    toast.style.alignItems = 'center';
-    toast.style.gap = '0.5rem';
-
-    toast.innerHTML = `<span class="live-dot" style="background: var(--ink); width: 8px; height: 8px;"></span> ${message}`;
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-        toast.style.transition = 'opacity 0.5s';
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 500);
-    }, 5000);
+    if (typeof window.showNotification === 'function') {
+        window.showNotification(message, 'start', 'MATCH STARTED');
+    }
 }
+
