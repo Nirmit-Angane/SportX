@@ -58,7 +58,7 @@ async function pollLiveMatches() {
             previousLiveMatchIds = currentLiveIds;
 
             renderHeroLive(allMatches);
-            renderLiveRail(allMatches);
+            renderLiveRail(allMatches, false);
             updateLiveTape();
         }
     } catch (error) {
@@ -82,12 +82,16 @@ async function loadHomepageData() {
         previousLiveMatchIds = new Set(liveMatches.map(m => m.id));
 
         renderHeroLive(allMatches);
-        renderLiveRail(allMatches);
+        renderLiveRail(allMatches, true);
         updateLiveTape();
         renderFeaturedTournament(events, allMatches);
         renderUpcoming(allMatches);
         renderResults(allMatches);
         renderTeams(teams);
+
+        if (typeof window.refreshScrollAnimations === 'function') {
+            window.refreshScrollAnimations();
+        }
 
     } catch (error) {
         console.error("Error loading homepage data", error);
@@ -341,7 +345,7 @@ function renderHeroLive(matches) {
     }
 }
 
-function renderLiveRail(matches) {
+function renderLiveRail(matches, isInitial = false) {
     const railEl = document.getElementById('live-matches-rail');
     if (!railEl) return;
     
@@ -351,7 +355,7 @@ function renderLiveRail(matches) {
     if (liveMatches.length === 0) {
         let nextMatchText = nextMatches.length > 0 ? `Next kick-off: ${nextMatches[0].home_team_name} vs ${nextMatches[0].away_team_name}` : '';
         railEl.innerHTML = `
-            <div class="state-empty" style="background: var(--ink); border-color: var(--white); color: var(--white);">
+            <div class="state-empty scroll-reveal" style="background: var(--ink); border-color: var(--white); color: var(--white);">
                 <h3 style="font-family: var(--font-display); font-style: italic;">NO MATCHES LIVE</h3>
                 <p style="color: var(--muted-on-ink); font-weight: 700;">${nextMatchText}</p>
             </div>
@@ -363,8 +367,8 @@ function renderLiveRail(matches) {
     let gridClass = isWide ? '' : 'grid-3';
     
     railEl.className = gridClass;
-    railEl.innerHTML = liveMatches.map(match => `
-        <a href="pages/match.html?id=${match.id}" class="card-live ${isWide ? 'card-live-wide' : ''}">
+    railEl.innerHTML = liveMatches.map((match, idx) => `
+        <a href="pages/match.html?id=${match.id}" class="card-live ${isWide ? 'card-live-wide' : ''} scroll-reveal-scale ${isInitial ? '' : 'in-view'}" style="--delay-index: ${idx};">
             <div class="card-live-header" style="display: flex; justify-content: space-between;">
                 <span style="color: var(--accent); font-weight: 900;"><span class="live-dot" style="display: inline-block; width: 6px; height: 6px; margin-right: 4px;"></span>LIVE</span>
                 <span style="font-variant-numeric: tabular-nums;">${match.timer || '00:00'}</span>
@@ -404,7 +408,7 @@ function renderFeaturedTournament(events, matches) {
     let segments = Math.floor((completedMatches / totalMatches) * 4);
 
     featEl.innerHTML = `
-        <div class="hero-split-card">
+        <div class="hero-split-card scroll-reveal">
             <div class="hero-split-left">
                 <div class="hsc-status"><span class="tag"><span>FEATURED TOURNAMENT</span></span></div>
                 <div class="hsc-title">${event.name}</div>
@@ -447,8 +451,8 @@ function renderUpcoming(matches) {
         return;
     }
 
-    upNextEl.innerHTML = upcoming.map(match => `
-        <a href="pages/match.html?id=${match.id}" class="fixture-row">
+    upNextEl.innerHTML = upcoming.map((match, idx) => `
+        <a href="pages/match.html?id=${match.id}" class="fixture-row scroll-reveal-left" style="--delay-index: ${idx};">
             <div class="f-time">${match.match_date ? match.match_date.substring(5,10) : ''}<br>${match.match_time ? match.match_time.substring(0,5) : 'TBA'}</div>
             <div class="f-team home">${match.home_team_name}</div>
             <div class="f-vs-score">VS</div>
@@ -469,11 +473,11 @@ function renderResults(matches) {
         return;
     }
 
-    resultsEl.innerHTML = completed.map(match => {
+    resultsEl.innerHTML = completed.map((match, idx) => {
         const homeWin = match.home_score > match.away_score;
         const awayWin = match.away_score > match.home_score;
         return `
-        <a href="pages/match.html?id=${match.id}" class="fixture-row row-winner">
+        <a href="pages/match.html?id=${match.id}" class="fixture-row row-winner scroll-reveal-right" style="--delay-index: ${idx};">
             <div class="f-time">${match.match_date ? match.match_date.substring(5,10) : ''}<br>FT</div>
             <div class="f-team home ${homeWin ? 'winner' : ''}">${match.home_team_name}</div>
             <div class="f-vs-score">${match.home_score} - ${match.away_score}</div>
@@ -494,10 +498,10 @@ function renderTeams(teams) {
         return;
     }
 
-    teamsEl.innerHTML = topTeams.map(team => {
+    teamsEl.innerHTML = topTeams.map((team, idx) => {
         const pClass = getTeamPattern(team.name);
         return `
-        <a href="pages/teams.html" class="team-card ${pClass}">
+        <a href="pages/teams.html" class="team-card ${pClass} scroll-reveal-scale" style="--delay-index: ${idx};">
             <div class="team-badge">
                 ${team.name.charAt(0)}
                 <div class="badge-pattern"></div>

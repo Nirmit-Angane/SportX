@@ -97,6 +97,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize Mobile Navigation
     setupMobileNav();
+
+    // Initialize Scroll Progress Indicator & Parallax
+    setupScrollProgress();
+
+    // Initialize Scroll Animations
+    initScrollAnimations();
 });
 
 // Setup Mobile Navigation Drawer
@@ -186,4 +192,96 @@ function setupMobileNav() {
         }
     });
 }
+
+// ==========================================================================
+// SCROLL PROGRESS BAR & SCROLL ANIMATIONS ENGINE
+// ==========================================================================
+let scrollObserver = null;
+
+function setupScrollProgress() {
+    let progressBar = document.getElementById('scroll-progress-bar');
+    if (!progressBar) {
+        progressBar = document.createElement('div');
+        progressBar.id = 'scroll-progress-bar';
+        progressBar.className = 'scroll-progress-bar';
+        progressBar.setAttribute('aria-hidden', 'true');
+        document.body.prepend(progressBar);
+    }
+
+    let ticking = false;
+    const updateProgressAndParallax = () => {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
+        
+        if (progressBar) {
+            progressBar.style.width = progress + '%';
+        }
+
+        // Hero Ghost Numeral Parallax
+        const heroGhost = document.getElementById('hero-ghost');
+        if (heroGhost && scrollTop < 1400) {
+            heroGhost.style.transform = `translate3d(0, ${scrollTop * 0.18}px, 0)`;
+        }
+
+        // Slanted panel parallax
+        const slantPanel = document.querySelector('.hero-section .slant-panel');
+        if (slantPanel && scrollTop < 1400) {
+            slantPanel.style.transform = `translate3d(0, ${scrollTop * 0.1}px, 0)`;
+        }
+
+        ticking = false;
+    };
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(updateProgressAndParallax);
+            ticking = true;
+        }
+    }, { passive: true });
+
+    // Initial calculation
+    updateProgressAndParallax();
+}
+
+function initScrollAnimations() {
+    const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const targets = document.querySelectorAll('.scroll-reveal, .scroll-reveal-left, .scroll-reveal-right, .scroll-reveal-scale');
+
+    if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+        targets.forEach(el => el.classList.add('in-view'));
+        return;
+    }
+
+    if (!scrollObserver) {
+        scrollObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            root: null,
+            rootMargin: '0px 0px -40px 0px',
+            threshold: 0.08
+        });
+    }
+
+    targets.forEach(el => {
+        if (el.classList.contains('in-view')) return;
+
+        const rect = el.getBoundingClientRect();
+        // If element is already in or above the viewport, reveal immediately
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+            el.classList.add('in-view');
+        } else {
+            scrollObserver.observe(el);
+        }
+    });
+}
+
+window.initScrollAnimations = initScrollAnimations;
+window.refreshScrollAnimations = initScrollAnimations;
+
 
