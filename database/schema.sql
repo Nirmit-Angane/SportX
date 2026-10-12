@@ -114,3 +114,16 @@ CREATE TABLE qr_codes (
     url VARCHAR(1024) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Match Events (Timeline)
+CREATE TABLE match_events (
+    id SERIAL PRIMARY KEY,
+    match_id INTEGER REFERENCES matches(id) ON DELETE CASCADE,
+    minute VARCHAR(10) NOT NULL,
+    type VARCHAR(50) NOT NULL, -- KICKOFF, GOAL, CARD_YELLOW, CARD_RED, SUBSTITUTION, HALFTIME, FULLTIME, OTHER
+    team_id INTEGER REFERENCES teams(id),
+    player_name VARCHAR(255),
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+

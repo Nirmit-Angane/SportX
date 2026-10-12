@@ -87,3 +87,43 @@ INSERT INTO standings (event_id, team_id, played, won, drawn, lost, goals_for, g
 (1, 6, 1, 0, 1, 0, 2, 2, 0, 1),
 (1, 7, 1, 0, 0, 1, 0, 1, -1, 0),
 (1, 8, 1, 1, 0, 0, 1, 0, 1, 3);
+
+-- Sample Match Events (Timeline for Live and Completed Matches)
+INSERT INTO match_events (match_id, minute, type, team_id, player_name, description) VALUES
+-- Match 10 (LIVE match: VIVA Warriors 2 - 1 Mumbai Titans)
+(10, '00''', 'KICKOFF', NULL, NULL, 'Match kickoff at Main Stadium in front of 48,000 fans'),
+(10, '18''', 'GOAL', 1, 'Raj Patel', 'Clinical low drive into the bottom left corner (Assist: Player A4)'),
+(10, '34''', 'CARD_YELLOW', 2, 'Amit Kumar', 'Tactical foul breaking up a dangerous counterattack'),
+(10, '45''', 'HALFTIME', NULL, NULL, 'First half concludes with VIVA Warriors leading 1 - 0'),
+(10, '52''', 'GOAL', 2, 'Player B5', 'Powerful header from a set-piece corner to equalize 1 - 1'),
+(10, '64''', 'GOAL', 1, 'Player A9', 'Spectacular chipped finish over the rushing goalkeeper to restore the lead 2 - 1!'),
+
+-- Match 11 (QF 1: VIVA Warriors 2 - 1 Mumbai Titans)
+(11, '00''', 'KICKOFF', NULL, NULL, 'Quarter-Final 1 underway under stadium floodlights'),
+(11, '29''', 'GOAL', 1, 'Raj Patel', 'Opens the scoring with a volley from edge of the penalty box'),
+(11, '45''', 'HALFTIME', NULL, NULL, 'Halftime interval. VIVA Warriors holds a 1 - 0 advantage'),
+(11, '61''', 'GOAL', 2, 'Player B7', 'Drilled strike past the goalkeeper to tie the game 1 - 1'),
+(11, '84''', 'GOAL', 1, 'Player A7', 'Dramatic late winner into the top corner! VIVA Warriors leads 2 - 1'),
+(11, '90''', 'FULLTIME', NULL, NULL, 'Final whistle! VIVA Warriors wins 2 - 1 and advances to Semi-Finals'),
+
+-- Match 12 (QF 2: Pune Strikers 3 - 1 Delhi Dynamos)
+(12, '00''', 'KICKOFF', NULL, NULL, 'Quarter-Final 2 kickoff at North Campus Field'),
+(12, '14''', 'GOAL', 3, 'John Doe', 'Quick counterattack finish puts Pune Strikers ahead 1 - 0'),
+(12, '39''', 'GOAL', 3, 'John Doe', 'Double for John Doe! Taps in a low cross for 2 - 0'),
+(12, '65''', 'GOAL', 4, 'Rahul Singh', 'Delhi Dynamos pulls one back with a curled effort (2 - 1)'),
+(12, '88''', 'GOAL', 3, 'Player A2', 'Seals the victory with a stoppage time header (3 - 1)'),
+(12, '90''', 'FULLTIME', NULL, NULL, 'Final whistle! Pune Strikers triumphs 3 - 1 to book Semi-Final spot'),
+
+-- Match 13 (QF 3: Chennai Super Kings 2 - 0 Bengaluru FC)
+(13, '00''', 'KICKOFF', NULL, NULL, 'Quarter-Final 3 kickoff'),
+(13, '42''', 'GOAL', 5, 'MS Dhoni', 'Captain leads from the front! Calm finish for 1 - 0'),
+(13, '77''', 'GOAL', 5, 'Coach Fleming', 'Insurance goal scored on a rebound (2 - 0)'),
+(13, '90''', 'FULLTIME', NULL, NULL, 'Full time! Chennai Super Kings secures clean sheet 2 - 0 win'),
+
+-- Match 14 (QF 4: Kerala Blasters 1 - 2 Goa FC)
+(14, '00''', 'KICKOFF', NULL, NULL, 'Quarter-Final 4 kickoff'),
+(14, '22''', 'GOAL', 7, 'Sahal Abdul', 'Kerala Blasters takes early 1 - 0 lead'),
+(14, '56''', 'GOAL', 8, 'Brandon Fernandes', 'Goa FC equalizes with a direct free kick (1 - 1)'),
+(14, '81''', 'GOAL', 8, 'Brandon Fernandes', 'Brace for Fernandes! Completes the comeback for 1 - 2!'),
+(14, '90''', 'FULLTIME', NULL, NULL, 'Final whistle! Goa FC clinches 2 - 1 comeback victory to advance');
+

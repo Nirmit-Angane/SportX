@@ -125,6 +125,36 @@ export const startMatch = async (req: Request, res: Response) => {
     const { id } = req.params;
     const result = await query(`UPDATE matches SET status = 'LIVE' WHERE id = $1 RETURNING *`, [id]);
     if (result.rows.length === 0) return sendError(res, 'Match not found', 404);
+    
+    // Ensure timer is active
+    await query(`UPDATE match_scores SET timer = '00:01' WHERE match_id = $1 AND (timer IS NULL OR timer = '00:00')`, [id]);
+
+    // Record kickoff event if none exists
+    const eventsCheck = await query(`SELECT id FROM match_events WHERE match_id = $1 AND type = 'KICKOFF'`, [id]);
+    if (eventsCheck.rows.length === 0) {
+      await query(
+        `INSERT INTO match_events (match_id, minute, type, description) VALUES ($1, '00''', 'KICKOFF', 'Match officially kicked off')`,
+        [id]
+      );
+    }
+
+    sendSuccess(res, result.rows[0]);
+  } catch (err: any) {
+    sendError(res, err.message);
+  }
+};
+
+export const breakMatch = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const result = await query(`UPDATE matches SET status = 'HALFTIME' WHERE id = $1 RETURNING *`, [id]);
+    if (result.rows.length === 0) return sendError(res, 'Match not found', 404);
+
+    await query(
+      `INSERT INTO match_events (match_id, minute, type, description) VALUES ($1, '45''', 'HALFTIME', 'Referee blows whistle for Halftime / Interval break')`,
+      [id]
+    );
+
     sendSuccess(res, result.rows[0]);
   } catch (err: any) {
     sendError(res, err.message);
@@ -134,21 +164,36 @@ export const startMatch = async (req: Request, res: Response) => {
 export const endMatch = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const { home_score, away_score, winner_id } = req.body || {};
+
+    // Update scores if provided
+    if (home_score !== undefined && away_score !== undefined) {
+      await query(
+        `UPDATE match_scores SET home_score = $1, away_score = $2, timer = '90:00', updated_at = CURRENT_TIMESTAMP WHERE match_id = $3`,
+        [home_score, away_score, id]
+      );
+    } else {
+      await query(`UPDATE match_scores SET timer = '90:00', updated_at = CURRENT_TIMESTAMP WHERE match_id = $1`, [id]);
+    }
+
     const result = await query(`UPDATE matches SET status = 'COMPLETED' WHERE id = $1 RETURNING *`, [id]);
     if (result.rows.length === 0) return sendError(res, 'Match not found', 404);
     
     const match = result.rows[0];
+    let advancedInfo: any = {};
     
     // Auto-advance bracket logic
     if (match.round && match.round.startsWith('Bracket:')) {
         const scoreRes = await query(`SELECT home_score, away_score FROM match_scores WHERE match_id = $1`, [id]);
         if (scoreRes.rows.length > 0) {
-            const { home_score, away_score } = scoreRes.rows[0];
-            let winnerId = null;
-            if (home_score > away_score) winnerId = match.home_team_id;
-            else if (away_score > home_score) winnerId = match.away_team_id;
-            // Fallback for draws - technically shouldn't happen in knockout, but we pick home team as winner to prevent crashes.
-            else winnerId = match.home_team_id; 
+            const hScore = scoreRes.rows[0].home_score ?? 0;
+            const aScore = scoreRes.rows[0].away_score ?? 0;
+            let winnerId = winner_id || null;
+            if (!winnerId) {
+                if (hScore > aScore) winnerId = match.home_team_id;
+                else if (aScore > hScore) winnerId = match.away_team_id;
+                else winnerId = match.home_team_id; 
+            }
             
             if (winnerId) {
                 let nextRound = null;
@@ -161,18 +206,85 @@ export const endMatch = async (req: Request, res: Response) => {
                 if (match.round === 'Bracket: SF 1') { nextRound = 'Bracket: Final'; nextSlot = 'home_team_id'; }
                 if (match.round === 'Bracket: SF 2') { nextRound = 'Bracket: Final'; nextSlot = 'away_team_id'; }
                 
-                if (nextRound) {
+                if (nextRound && nextSlot) {
                     await query(`UPDATE matches SET ${nextSlot} = $1 WHERE event_id = $2 AND round = $3`, [winnerId, match.event_id, nextRound]);
+                    
+                    const winnerTeamRes = await query(`SELECT name FROM teams WHERE id = $1`, [winnerId]);
+                    const winnerName = winnerTeamRes.rows[0]?.name || 'Winner';
+                    advancedInfo = {
+                        winner_id: winnerId,
+                        winner_name: winnerName,
+                        advanced_to: nextRound,
+                        slot: nextSlot
+                    };
                 }
             }
         }
     }
+
+    // Record full time event
+    await query(
+      `INSERT INTO match_events (match_id, minute, type, description) VALUES ($1, '90''', 'FULLTIME', 'Match officially concluded. Full-time whistle blown.')`,
+      [id]
+    );
     
-    sendSuccess(res, match);
+    sendSuccess(res, { ...match, ...advancedInfo });
   } catch (err: any) {
     sendError(res, err.message);
   }
 };
+
+export const getMatchEvents = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const result = await query(
+      `SELECT me.*, t.name as team_name 
+       FROM match_events me
+       LEFT JOIN teams t ON me.team_id = t.id
+       WHERE me.match_id = $1 
+       ORDER BY me.id ASC`,
+      [id]
+    );
+    sendSuccess(res, result.rows);
+  } catch (err: any) {
+    sendError(res, err.message);
+  }
+};
+
+export const addMatchEvent = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { minute, type, team_id, player_name, description } = req.body;
+    
+    if (!minute || !type) {
+      return sendError(res, 'Minute and event type are required', 400);
+    }
+
+    const result = await query(
+      `INSERT INTO match_events (match_id, minute, type, team_id, player_name, description) 
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [id, minute, type, team_id || null, player_name || null, description || '']
+    );
+
+    // If event is a GOAL, update the score automatically
+    if (type === 'GOAL' && team_id) {
+      const matchRes = await query(`SELECT home_team_id, away_team_id FROM matches WHERE id = $1`, [id]);
+      if (matchRes.rows.length > 0) {
+        const m = matchRes.rows[0];
+        if (m.home_team_id == team_id) {
+          await query(`UPDATE match_scores SET home_score = home_score + 1, updated_at = CURRENT_TIMESTAMP WHERE match_id = $1`, [id]);
+        } else if (m.away_team_id == team_id) {
+          await query(`UPDATE match_scores SET away_score = away_score + 1, updated_at = CURRENT_TIMESTAMP WHERE match_id = $1`, [id]);
+        }
+      }
+    }
+
+    sendSuccess(res, result.rows[0]);
+  } catch (err: any) {
+    sendError(res, err.message);
+  }
+};
+
 
 export const generateBracket = async (req: Request, res: Response) => {
   try {

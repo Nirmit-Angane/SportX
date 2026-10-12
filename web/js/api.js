@@ -172,3 +172,95 @@ window.addEventListener('resize', () => {
     }
 });
 
+/**
+ * Global Cyber-Brutalist Live Notification System
+ * Supports Start, Break, End, and Tournament Advancement notifications with cross-tab broadcast.
+ */
+function showNotification(message, type = 'info', title = 'SPORTX LIVE') {
+    let container = document.getElementById('sportx-toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'sportx-toast-container';
+        container.style.cssText = 'position: fixed; top: 24px; right: 24px; z-index: 999999; display: flex; flex-direction: column; gap: 12px; pointer-events: none; max-width: 440px; width: calc(100% - 48px);';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        background: #03060B;
+        border: 2px solid var(--accent, #6EC6FF);
+        box-shadow: 6px 6px 0 var(--accent, #6EC6FF);
+        color: #fff;
+        padding: 1.1rem 1.35rem;
+        font-family: var(--font-display, inherit);
+        pointer-events: auto;
+        transform: translateX(120%);
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+        opacity: 0;
+        position: relative;
+    `;
+
+    let dotColor = 'var(--accent, #6EC6FF)';
+    let badgeTitle = title;
+    if (type === 'live' || type === 'start') {
+        dotColor = '#00E676';
+        if (title === 'SPORTX LIVE') badgeTitle = 'MATCH STARTED';
+    } else if (type === 'break' || type === 'halftime') {
+        dotColor = '#F5A623';
+        if (title === 'SPORTX LIVE') badgeTitle = 'HALFTIME BREAK';
+    } else if (type === 'end' || type === 'completed') {
+        dotColor = '#FF3366';
+        if (title === 'SPORTX LIVE') badgeTitle = 'MATCH ENDED';
+    } else if (type === 'bracket' || type === 'trophy') {
+        dotColor = '#FFD700';
+        if (title === 'SPORTX LIVE') badgeTitle = 'TOURNAMENT ADVANCEMENT';
+    }
+
+    toast.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px; font-weight: 900; font-size: 0.85rem; letter-spacing: 1px; color: ${dotColor}; text-transform: uppercase; font-style: italic;">
+                <span class="live-dot" style="background: ${dotColor}; width: 9px; height: 9px; box-shadow: 0 0 8px ${dotColor}; border-radius: 50%;"></span>
+                <span>${badgeTitle}</span>
+            </div>
+            <button style="background: none; border: none; color: rgba(255,255,255,0.6); font-size: 1.4rem; cursor: pointer; line-height: 1; padding: 0 4px;" onclick="this.closest('#sportx-toast-container > div').remove()">&times;</button>
+        </div>
+        <div style="font-weight: 700; font-size: 1rem; color: #fff; line-height: 1.4;">
+            ${message}
+        </div>
+    `;
+
+    container.appendChild(toast);
+
+    requestAnimationFrame(() => {
+        toast.style.transform = 'translateX(0)';
+        toast.style.opacity = '1';
+    });
+
+    // Broadcast notification across browser tabs
+    try {
+        localStorage.setItem('sportx_latest_notify', JSON.stringify({ message, type, title: badgeTitle, time: Date.now() }));
+    } catch (e) {}
+
+    // Auto dismiss after 6 seconds
+    setTimeout(() => {
+        toast.style.transform = 'translateX(120%)';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 400);
+    }, 6000);
+}
+
+window.showNotification = showNotification;
+
+// Listen for broadcast notifications across tabs
+window.addEventListener('storage', (e) => {
+    if (e.key === 'sportx_latest_notify' && e.newValue) {
+        try {
+            const data = JSON.parse(e.newValue);
+            if (Date.now() - data.time < 5000) {
+                showNotification(data.message, data.type, data.title);
+            }
+        } catch (err) {}
+    }
+});
+
+

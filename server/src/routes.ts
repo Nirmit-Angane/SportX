@@ -52,8 +52,12 @@ router.post('/matches', requireAdmin, matchController.createMatch);
 router.put('/matches/:id', requireMatchOperator, matchController.updateMatch);
 router.delete('/matches/:id', requireAdmin, matchController.deleteMatch);
 router.post('/matches/:id/start', requireMatchOperator, matchController.startMatch);
+router.post('/matches/:id/break', requireMatchOperator, matchController.breakMatch);
 router.post('/matches/:id/end', requireMatchOperator, matchController.endMatch);
+router.get('/matches/:id/events', matchController.getMatchEvents);
+router.post('/matches/:id/events', requireMatchOperator, matchController.addMatchEvent);
 router.post('/matches/generate-bracket', requireAdmin, matchController.generateBracket);
+
 
 // Score
 router.get('/matches/:id/score', scoreController.getScore);

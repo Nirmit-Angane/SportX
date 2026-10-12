@@ -135,16 +135,25 @@ async function loadMatches() {
     const res = await fetchAPI('/matches');
     const tbody = document.getElementById('matches-table-body');
     if (res.success) {
-        tbody.innerHTML = res.data.map(m => `
+        tbody.innerHTML = res.data.map(m => {
+            let statusBadge = `<span style="padding: 2px 8px; font-weight: 800; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.2);">${m.status}</span>`;
+            if (m.status === 'LIVE') {
+                statusBadge = `<span style="padding: 2px 8px; font-weight: 800; font-size: 0.85rem; background: var(--accent-red, #FF3366); color: #fff; box-shadow: 0 0 8px rgba(255,51,102,0.6);">● LIVE</span>`;
+            } else if (m.status === 'HALFTIME' || m.status === 'BREAK') {
+                statusBadge = `<span style="padding: 2px 8px; font-weight: 800; font-size: 0.85rem; background: #F5A623; color: #000;">⏸ HALFTIME</span>`;
+            } else if (m.status === 'COMPLETED') {
+                statusBadge = `<span style="padding: 2px 8px; font-weight: 800; font-size: 0.85rem; background: rgba(255,255,255,0.1); color: var(--accent);">COMPLETED</span>`;
+            }
+            return `
             <tr>
                 <td>${m.id}</td>
                 <td>${m.event_name || '-'}</td>
-                <td>${m.home_team_name}</td>
-                <td>${m.away_team_name}</td>
-                <td>${m.status}</td>
-                <td><a href="pages/match.html?id=${m.id}" class="text-blue">View</a></td>
+                <td style="font-weight: 700;">${m.home_team_name || 'TBD'}</td>
+                <td style="font-weight: 700;">${m.away_team_name || 'TBD'}</td>
+                <td>${statusBadge}</td>
+                <td><a href="pages/match.html?id=${m.id}" class="text-blue" style="font-weight: 800; text-decoration: underline;">View</a></td>
             </tr>
-        `).join('');
+        `}).join('');
     } else {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Error loading matches</td></tr>';
     }
