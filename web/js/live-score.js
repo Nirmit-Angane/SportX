@@ -11,44 +11,21 @@ const venueDetailsEl = document.getElementById('venue-details');
 const statusIndicator = document.getElementById('status-indicator');
 
 let currentMatch = null;
-let isAdminUser = false;
 let pollingInterval = null;
 let timerTickInterval = null;
 let currentTimerSeconds = 0;
 
-// Initialize on page load
+// Initialize on page load (Viewer Read-Only Match Center)
 document.addEventListener('DOMContentLoaded', async () => {
     if (!matchId) {
         document.querySelector('.mc-score-grid').innerHTML = '<div style="color: var(--accent-red); font-size: 2rem;">Error: No Match ID provided.</div>';
         return;
     }
 
-    await checkOperatorAuth();
     setupTabSwitching();
-    setupOperatorControls();
     await loadMatchDetails();
     startScorePolling();
 });
-
-// Check if current user is admin / operator
-async function checkOperatorAuth() {
-    const token = localStorage.getItem('sportx_token');
-    if (!token) return;
-
-    try {
-        const res = await fetchAPI('/auth/me');
-        if (res.success && res.data && res.data.user) {
-            const role = res.data.user.role;
-            if (role === 'ADMIN' || role === 'MATCH_OPERATOR') {
-                isAdminUser = true;
-                const deck = document.getElementById('operator-deck');
-                if (deck) deck.style.display = 'block';
-            }
-        }
-    } catch (e) {
-        console.warn('Operator auth check failed:', e);
-    }
-}
 
 // Tab navigation handler
 function setupTabSwitching() {
@@ -95,7 +72,6 @@ async function loadMatchDetails() {
         venueDetailsEl.innerText = `VENUE: ${match.venue_name || 'NORTH CAMPUS ARENA'} • ${match.venue_city || 'MAIN VENUE'}`;
         
         updateStatusIndicator(match.status);
-        updateOperatorDeckUI(match);
         populateOverviewTab(match);
         loadTimelineEvents();
         renderStats();
@@ -125,51 +101,6 @@ function updateStatusIndicator(status) {
     } else {
         statusIndicator.innerHTML = '<div class="live-dot" style="background-color: rgba(255,255,255,0.4);"></div> SCHEDULED';
         statusIndicator.style.color = 'var(--muted-on-ink, #8FA0B8)';
-    }
-}
-
-// Update operator deck buttons and states
-function updateOperatorDeckUI(match) {
-    if (!isAdminUser) return;
-
-    const deckBadge = document.getElementById('deck-status-badge');
-    if (deckBadge) deckBadge.innerText = `STATUS: ${match.status}`;
-
-    const deckHomeName = document.getElementById('deck-home-name');
-    const deckAwayName = document.getElementById('deck-away-name');
-    const deckHomeScore = document.getElementById('deck-home-score');
-    const deckAwayScore = document.getElementById('deck-away-score');
-
-    if (deckHomeName) deckHomeName.innerText = match.home_team_name || 'Home';
-    if (deckAwayName) deckAwayName.innerText = match.away_team_name || 'Away';
-    if (deckHomeScore) deckHomeScore.innerText = match.home_score !== null ? match.home_score : '0';
-    if (deckAwayScore) deckAwayScore.innerText = match.away_score !== null ? match.away_score : '0';
-
-    const btnStart = document.getElementById('btn-start-match');
-    const btnBreak = document.getElementById('btn-break-match');
-    const btnResume = document.getElementById('btn-resume-match');
-    const btnEnd = document.getElementById('btn-end-match');
-
-    if (match.status === 'SCHEDULED') {
-        if (btnStart) btnStart.style.display = 'inline-flex';
-        if (btnBreak) btnBreak.style.display = 'none';
-        if (btnResume) btnResume.style.display = 'none';
-        if (btnEnd) btnEnd.style.display = 'inline-flex';
-    } else if (match.status === 'LIVE') {
-        if (btnStart) btnStart.style.display = 'none';
-        if (btnBreak) btnBreak.style.display = 'inline-flex';
-        if (btnResume) btnResume.style.display = 'none';
-        if (btnEnd) btnEnd.style.display = 'inline-flex';
-    } else if (match.status === 'HALFTIME' || match.status === 'BREAK') {
-        if (btnStart) btnStart.style.display = 'none';
-        if (btnBreak) btnBreak.style.display = 'none';
-        if (btnResume) btnResume.style.display = 'inline-flex';
-        if (btnEnd) btnEnd.style.display = 'inline-flex';
-    } else if (match.status === 'COMPLETED') {
-        if (btnStart) btnStart.style.display = 'none';
-        if (btnBreak) btnBreak.style.display = 'none';
-        if (btnResume) btnResume.style.display = 'none';
-        if (btnEnd) btnEnd.style.display = 'none';
     }
 }
 
@@ -425,222 +356,6 @@ function renderStats() {
             </div>
         </div>
     `).join('');
-}
-
-// Setup Admin Match Control Deck listeners
-function setupOperatorControls() {
-    // START MATCH
-    const btnStart = document.getElementById('btn-start-match');
-    if (btnStart) {
-        btnStart.addEventListener('click', async () => {
-            btnStart.disabled = true;
-            const res = await fetchAPI(`/matches/${matchId}/start`, { method: 'POST' });
-            btnStart.disabled = false;
-            if (res.success) {
-                showNotification(`MATCH KICKOFF: ${currentMatch.home_team_name} vs ${currentMatch.away_team_name} is now LIVE!`, 'start', 'MATCH STARTED');
-                await loadMatchDetails();
-            } else {
-                alert('Error starting match: ' + res.message);
-            }
-        });
-    }
-
-    // BREAK / HALFTIME
-    const btnBreak = document.getElementById('btn-break-match');
-    if (btnBreak) {
-        btnBreak.addEventListener('click', async () => {
-            btnBreak.disabled = true;
-            const res = await fetchAPI(`/matches/${matchId}/break`, { method: 'POST' });
-            btnBreak.disabled = false;
-            if (res.success) {
-                showNotification(`HALFTIME: ${currentMatch.home_team_name} vs ${currentMatch.away_team_name} interval break initiated.`, 'break', 'HALFTIME BREAK');
-                await loadMatchDetails();
-            } else {
-                alert('Error initiating break: ' + res.message);
-            }
-        });
-    }
-
-    // RESUME SECOND HALF
-    const btnResume = document.getElementById('btn-resume-match');
-    if (btnResume) {
-        btnResume.addEventListener('click', async () => {
-            btnResume.disabled = true;
-            const res = await fetchAPI(`/matches/${matchId}/start`, { method: 'POST' });
-            btnResume.disabled = false;
-            if (res.success) {
-                showNotification(`MATCH RESUMED: Second half underway for ${currentMatch.home_team_name} vs ${currentMatch.away_team_name}!`, 'start', 'MATCH RESUMED');
-                await loadMatchDetails();
-            } else {
-                alert('Error resuming match: ' + res.message);
-            }
-        });
-    }
-
-    // END MATCH (Open Modal)
-    const btnEnd = document.getElementById('btn-end-match');
-    if (btnEnd) {
-        btnEnd.addEventListener('click', () => {
-            if (!currentMatch) return;
-            const modal = document.getElementById('end-match-modal');
-            const mHome = document.getElementById('modal-home-name');
-            const mAway = document.getElementById('modal-away-name');
-            const mHScore = document.getElementById('modal-home-score');
-            const mAScore = document.getElementById('modal-away-score');
-            const tieWrapper = document.getElementById('modal-tie-select-wrapper');
-            const winnerSelect = document.getElementById('modal-winner-select');
-
-            mHome.innerText = currentMatch.home_team_name || 'Home';
-            mAway.innerText = currentMatch.away_team_name || 'Away';
-            mHScore.value = currentMatch.home_score !== null ? currentMatch.home_score : 0;
-            mAScore.value = currentMatch.away_score !== null ? currentMatch.away_score : 0;
-
-            // Handle tie check
-            const checkTie = () => {
-                const isKnockout = currentMatch.round && currentMatch.round.startsWith('Bracket:');
-                if (isKnockout && mHScore.value === mAScore.value) {
-                    tieWrapper.style.display = 'block';
-                    winnerSelect.innerHTML = `
-                        <option value="${currentMatch.home_team_id}">${currentMatch.home_team_name || 'Home'} (Advances on Penalties)</option>
-                        <option value="${currentMatch.away_team_id}">${currentMatch.away_team_name || 'Away'} (Advances on Penalties)</option>
-                    `;
-                } else {
-                    tieWrapper.style.display = 'none';
-                }
-            };
-
-            mHScore.oninput = checkTie;
-            mAScore.oninput = checkTie;
-            checkTie();
-
-            modal.style.display = 'flex';
-        });
-    }
-
-    // CONFIRM END MATCH
-    const btnConfirmEnd = document.getElementById('btn-confirm-end-match');
-    if (btnConfirmEnd) {
-        btnConfirmEnd.addEventListener('click', async () => {
-            const h = parseInt(document.getElementById('modal-home-score').value, 10) || 0;
-            const a = parseInt(document.getElementById('modal-away-score').value, 10) || 0;
-            const winnerSelect = document.getElementById('modal-winner-select');
-            const winnerId = (h === a && winnerSelect && winnerSelect.value) ? parseInt(winnerSelect.value, 10) : null;
-
-            btnConfirmEnd.disabled = true;
-            btnConfirmEnd.innerText = 'CONCLUDING...';
-
-            const res = await fetchAPI(`/matches/${matchId}/end`, {
-                method: 'POST',
-                body: JSON.stringify({ home_score: h, away_score: a, winner_id: winnerId })
-            });
-
-            btnConfirmEnd.disabled = false;
-            btnConfirmEnd.innerText = 'CONFIRM & END MATCH';
-
-            if (res.success) {
-                document.getElementById('end-match-modal').style.display = 'none';
-
-                showNotification(
-                    `MATCH ENDED: ${currentMatch.home_team_name} ${h} - ${a} ${currentMatch.away_team_name}. Match concluded!`,
-                    'end',
-                    'MATCH COMPLETED'
-                );
-
-                if (res.data && res.data.advanced_to && res.data.winner_name) {
-                    setTimeout(() => {
-                        showNotification(
-                            `🏆 TOURNAMENT ADVANCEMENT: ${res.data.winner_name} advances to ${res.data.advanced_to}! Bracket updated.`,
-                            'bracket',
-                            'TOURNAMENT ADVANCEMENT'
-                        );
-                    }, 1000);
-                }
-
-                await loadMatchDetails();
-            } else {
-                alert('Error ending match: ' + res.message);
-            }
-        });
-    }
-
-    // Quick score steppers
-    setupScoreStepper('btn-home-plus', 1, 0, true);
-    setupScoreStepper('btn-home-minus', -1, 0, false);
-    setupScoreStepper('btn-away-plus', 0, 1, true);
-    setupScoreStepper('btn-away-minus', 0, -1, false);
-
-    // Quick add event
-    const btnAddEvent = document.getElementById('btn-add-event');
-    if (btnAddEvent) {
-        btnAddEvent.addEventListener('click', async () => {
-            if (!currentMatch) return;
-            const minute = document.getElementById('event-minute').value.trim() || `${Math.floor(currentTimerSeconds / 60)}'`;
-            const type = document.getElementById('event-type').value;
-            const teamSide = document.getElementById('event-team').value;
-            const teamId = teamSide === 'home' ? currentMatch.home_team_id : currentMatch.away_team_id;
-            const desc = document.getElementById('event-desc').value.trim() || `${type} recorded`;
-
-            const res = await fetchAPI(`/matches/${matchId}/events`, {
-                method: 'POST',
-                body: JSON.stringify({ minute, type, team_id: teamId, description: desc })
-            });
-
-            if (res.success) {
-                document.getElementById('event-desc').value = '';
-                showNotification(`Event Logged: ${type} at ${minute}`, 'info', 'EVENT RECORDED');
-                await loadMatchDetails();
-            } else {
-                alert('Error adding event: ' + res.message);
-            }
-        });
-    }
-}
-
-// Score stepper helper
-function setupScoreStepper(btnId, deltaH, deltaA, isGoal) {
-    const btn = document.getElementById(btnId);
-    if (!btn) return;
-    btn.addEventListener('click', async () => {
-        if (!currentMatch) return;
-        const oldH = Number(currentMatch.home_score) || 0;
-        const oldA = Number(currentMatch.away_score) || 0;
-        const newH = Math.max(0, oldH + deltaH);
-        const newA = Math.max(0, oldA + deltaA);
-
-        const res = await fetchAPI(`/matches/${matchId}/score`, {
-            method: 'PUT',
-            body: JSON.stringify({ home_score: newH, away_score: newA, timer: timerEl.innerText })
-        });
-
-        if (res.success) {
-            currentMatch.home_score = newH;
-            currentMatch.away_score = newA;
-            homeScoreEl.innerText = newH;
-            awayScoreEl.innerText = newA;
-            updateOperatorDeckUI(currentMatch);
-            renderStats();
-
-            if (isGoal) {
-                const scoringTeam = deltaH > 0 ? (currentMatch.home_team_name || 'Home') : (currentMatch.away_team_name || 'Away');
-                const scoringTeamId = deltaH > 0 ? currentMatch.home_team_id : currentMatch.away_team_id;
-                const min = `${Math.floor(currentTimerSeconds / 60)}'`;
-
-                showNotification(`⚽ GOAL! ${scoringTeam} scores! Current: ${newH} - ${newA}`, 'live', 'GOAL SCORED');
-
-                // Log event
-                await fetchAPI(`/matches/${matchId}/events`, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        minute: min,
-                        type: 'GOAL',
-                        team_id: scoringTeamId,
-                        description: `Goal scored by ${scoringTeam} (${newH} - ${newA})`
-                    })
-                });
-                loadTimelineEvents();
-            }
-        }
-    });
 }
 
 // Timer helpers

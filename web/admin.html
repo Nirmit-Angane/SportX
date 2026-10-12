@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPORTX | Admin Dashboard</title>
-    <link rel="stylesheet" href="css/style.css?v=1791809657">
-    <link rel="stylesheet" href="css/components.css?v=1791809657">
-    <link rel="stylesheet" href="css/bracket.css?v=1791809657">
-    <link rel="stylesheet" href="css/responsive.css?v=1791809657">
+    <link rel="stylesheet" href="css/style.css?v=1791810261">
+    <link rel="stylesheet" href="css/components.css?v=1791810261">
+    <link rel="stylesheet" href="css/bracket.css?v=1791810261">
+    <link rel="stylesheet" href="css/responsive.css?v=1791810261">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         .section-view { display: none; }
@@ -117,38 +117,133 @@
             </div>
         </div>
 
-        <!-- Live Score View -->
+        <!-- Live Score View (Admin Match Operator Control Deck) -->
         <div id="view-live-score" class="section-view">
-            <div class="form-group" style="max-width: 400px; margin-bottom: 2rem;">
-                <label class="form-label" style="color: var(--white);">Select Match to Control</label>
-                <select class="form-input" id="live-match-select">
-                    <option value="">-- Select Match --</option>
-                </select>
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 1rem; margin-bottom: 2rem;">
+                <div class="form-group" style="max-width: 480px; margin-bottom: 0; flex: 1;">
+                    <label class="form-label" style="color: var(--white); font-weight: 800; letter-spacing: 0.5px;">
+                        <i data-lucide="radio" style="width: 18px; height: 18px; vertical-align: middle; color: var(--accent); margin-right: 6px;"></i> SELECT MATCH TO CONTROL
+                    </label>
+                    <select class="form-input" id="live-match-select" style="background: #000; color: #fff; border: 2px solid var(--accent); font-weight: 700; height: 48px;">
+                        <option value="">-- Select Match --</option>
+                    </select>
+                </div>
+                <div id="admin-match-quick-links" style="display: none; align-items: center; gap: 10px;">
+                    <button id="admin-btn-refresh-match" class="btn btn-secondary" style="font-size: 0.85rem; font-weight: 800;">
+                        <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i> REFRESH
+                    </button>
+                    <a id="admin-view-match-link" href="#" target="_blank" class="btn btn-primary" style="font-size: 0.85rem; font-weight: 800;">
+                        <i data-lucide="external-link" style="width: 16px; height: 16px;"></i> OPEN VIEWER PAGE
+                    </a>
+                </div>
             </div>
 
-            <div id="score-control-area" style="display:none; background: var(--paper); color: var(--ink); padding: 2rem; border: var(--border-xl) solid var(--ink);">
-                <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 2rem; align-items: center; text-align: center;">
-                    <div>
-                        <h2 id="ctrl-home-team" style="font-size: 2rem; color: var(--ink);">HOME</h2>
-                        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; align-items: center;">
-                            <button class="btn btn-secondary" onclick="updateScore('home', -1)" style="min-height: 48px; padding: 0 1rem;"><span>-</span></button>
-                            <span id="ctrl-home-score" style="font-size: 5rem; font-family: var(--font-display); font-weight: 900; line-height: 1;">0</span>
-                            <button class="btn btn-primary" onclick="updateScore('home', 1)" style="min-height: 48px; padding: 0 1rem;"><span>+</span></button>
+            <div id="no-match-selected-msg" style="background: var(--ink-2); border: 2px dashed rgba(255,255,255,0.2); padding: 3rem; text-align: center; color: var(--muted-on-ink);">
+                <i data-lucide="play-circle" style="width: 48px; height: 48px; color: var(--accent); margin-bottom: 1rem;"></i>
+                <h3 style="color: #fff; margin-bottom: 0.5rem; font-family: var(--font-display); font-style: italic;">NO MATCH SELECTED</h3>
+                <p style="margin: 0; font-size: 0.95rem;">Select an active or scheduled match above to activate the Live Match Operator Control Deck.</p>
+            </div>
+
+            <div id="score-control-area" style="display: none;">
+                <div class="operator-deck" style="margin-top: 0;">
+                    <!-- Deck Header -->
+                    <div class="operator-deck-header">
+                        <div>
+                            <div id="admin-deck-event" style="font-size: 0.85rem; color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">SPORTX TOURNAMENT • MATCH</div>
+                            <h3 id="admin-deck-title" style="font-size: 1.5rem; margin: 4px 0 0 0; color: #fff; font-family: var(--font-display); font-style: italic;">HOME vs AWAY</h3>
+                            <div id="admin-deck-venue" style="font-size: 0.85rem; color: var(--muted-on-ink); margin-top: 4px;">VENUE: MAIN ARENA</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div id="admin-deck-status-badge" style="font-size: 0.9rem; font-weight: 900; padding: 6px 14px; background: rgba(0,0,0,0.6); border: 2px solid var(--accent); color: var(--accent); display: inline-block;">
+                                STATUS: SCHEDULED
+                            </div>
                         </div>
                     </div>
-                    
-                    <div style="display: flex; flex-direction: column; align-items: center;">
-                        <div class="state-live" style="margin-bottom: 1rem;"><div class="live-dot"></div> LIVE</div>
-                        <h2 id="ctrl-timer" style="font-size: 2.5rem; color: var(--ink);">00:00</h2>
-                        <button class="btn btn-secondary" onclick="endMatch()" style="margin-top: 2rem;"><span>END MATCH</span></button>
+
+                    <!-- Match Flow Action Controls -->
+                    <div class="operator-actions">
+                        <button id="admin-btn-start" class="btn btn-primary" style="background: #00E676; color: #000; font-weight: 900; border-color: #00E676;">
+                            <i data-lucide="play" style="width: 18px; height: 18px;"></i> START MATCH
+                        </button>
+                        <button id="admin-btn-break" class="btn btn-secondary" style="background: #F5A623; color: #000; font-weight: 900; border-color: #F5A623; display: none;">
+                            <i data-lucide="pause" style="width: 18px; height: 18px;"></i> HALFTIME / BREAK
+                        </button>
+                        <button id="admin-btn-resume" class="btn btn-primary" style="background: #00E676; color: #000; font-weight: 900; border-color: #00E676; display: none;">
+                            <i data-lucide="play" style="width: 18px; height: 18px;"></i> RESUME 2ND HALF
+                        </button>
+                        <button id="admin-btn-end" class="btn btn-primary" style="background: var(--accent-red, #FF3366); color: #fff; font-weight: 900; border-color: var(--accent-red, #FF3366);">
+                            <i data-lucide="flag" style="width: 18px; height: 18px;"></i> END MATCH
+                        </button>
                     </div>
-                    
-                    <div>
-                        <h2 id="ctrl-away-team" style="font-size: 2rem; color: var(--ink);">AWAY</h2>
-                        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; align-items: center;">
-                            <button class="btn btn-secondary" onclick="updateScore('away', -1)" style="min-height: 48px; padding: 0 1rem;"><span>-</span></button>
-                            <span id="ctrl-away-score" style="font-size: 5rem; font-family: var(--font-display); font-weight: 900; line-height: 1;">0</span>
-                            <button class="btn btn-primary" onclick="updateScore('away', 1)" style="min-height: 48px; padding: 0 1rem;"><span>+</span></button>
+
+                    <!-- Live Score & Stepper Display -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; align-items: center; background: rgba(0,0,0,0.5); padding: 1.5rem; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 1.5rem;">
+                        <!-- Home Team -->
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.85rem; color: var(--accent); font-weight: 800; text-transform: uppercase;">HOME TEAM</div>
+                            <h2 id="ctrl-home-team" style="font-size: 1.6rem; color: #fff; margin: 6px 0; font-family: var(--font-display);">HOME</h2>
+                            <div style="display: flex; gap: 0.75rem; justify-content: center; align-items: center; margin-top: 10px;">
+                                <button class="btn btn-secondary" id="admin-home-minus" style="padding: 6px 14px; font-weight: 900; min-height: 42px;">-1</button>
+                                <span id="ctrl-home-score" style="font-size: 3.5rem; font-family: var(--font-display); font-weight: 900; min-width: 50px; color: var(--accent);">0</span>
+                                <button class="btn btn-primary" id="admin-home-plus" style="padding: 6px 16px; font-weight: 900; min-height: 42px;">+ GOAL</button>
+                            </div>
+                        </div>
+
+                        <!-- Match Clock & Indicator -->
+                        <div style="text-align: center; padding: 1rem 0; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <div id="admin-ctrl-status-indicator" style="font-size: 0.85rem; font-weight: 800; margin-bottom: 6px; letter-spacing: 1px; color: var(--muted-on-ink);">
+                                MATCH TIME
+                            </div>
+                            <h2 id="ctrl-timer" style="font-size: 3rem; font-family: var(--font-display); font-weight: 900; color: #fff; margin: 0; letter-spacing: 2px;">00:00</h2>
+                        </div>
+
+                        <!-- Away Team -->
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.85rem; color: var(--accent); font-weight: 800; text-transform: uppercase;">AWAY TEAM</div>
+                            <h2 id="ctrl-away-team" style="font-size: 1.6rem; color: #fff; margin: 6px 0; font-family: var(--font-display);">AWAY</h2>
+                            <div style="display: flex; gap: 0.75rem; justify-content: center; align-items: center; margin-top: 10px;">
+                                <button class="btn btn-secondary" id="admin-away-minus" style="padding: 6px 14px; font-weight: 900; min-height: 42px;">-1</button>
+                                <span id="ctrl-away-score" style="font-size: 3.5rem; font-family: var(--font-display); font-weight: 900; min-width: 50px; color: #fff;">0</span>
+                                <button class="btn btn-primary" id="admin-away-plus" style="padding: 6px 16px; font-weight: 900; min-height: 42px;">+ GOAL</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Event Logger -->
+                    <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 1.25rem; margin-bottom: 1.5rem;">
+                        <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 0.75rem; letter-spacing: 0.5px;">
+                            <i data-lucide="activity" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;"></i> LOG MATCH EVENT
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+                            <input type="text" id="admin-event-minute" placeholder="Min (e.g. 23')" style="width: 100px; background: #000; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; font-weight: 700;">
+                            <select id="admin-event-type" style="background: #000; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; font-weight: 700;">
+                                <option value="GOAL">⚽ Goal</option>
+                                <option value="CARD_YELLOW">🟨 Yellow Card</option>
+                                <option value="CARD_RED">🟥 Red Card</option>
+                                <option value="SUBSTITUTION">🔄 Substitution</option>
+                                <option value="OTHER">⚡ Key Play / Event</option>
+                            </select>
+                            <select id="admin-event-team" style="background: #000; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; font-weight: 700;">
+                                <option value="home">Home Team</option>
+                                <option value="away">Away Team</option>
+                            </select>
+                            <input type="text" id="admin-event-desc" placeholder="Player name / event notes..." style="flex: 1; min-width: 200px; background: #000; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; font-weight: 600;">
+                            <button id="admin-btn-add-event" class="btn btn-secondary" style="font-weight: 900; padding: 8px 20px;">
+                                <i data-lucide="plus"></i> RECORD EVENT
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Logged Events Stream for this Match -->
+                    <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 1.25rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                            <div style="font-size: 0.85rem; font-weight: 800; color: var(--muted-on-ink); text-transform: uppercase;">MATCH TIMELINE FEED</div>
+                            <button id="admin-btn-refresh-events" class="btn-icon" style="font-size: 0.75rem; color: var(--accent); background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                                <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Refresh Feed
+                            </button>
+                        </div>
+                        <div id="admin-events-stream" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+                            <div style="color: var(--muted-on-ink); font-size: 0.9rem;">No events logged yet.</div>
                         </div>
                     </div>
                 </div>
@@ -246,6 +341,48 @@
     
     </div>
 
+    <!-- End Match Modal Dialog for Admin -->
+    <div id="admin-end-match-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 99999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div style="background: #040812; border: 3px solid var(--accent); box-shadow: 12px 12px 0 var(--accent); max-width: 520px; width: 90%; padding: 2rem; color: #fff;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.75rem;">
+                <h3 style="font-family: var(--font-display); font-style: italic; font-weight: 900; font-size: 1.5rem; margin: 0; color: var(--accent);">CONCLUDE MATCH & FINALIZE</h3>
+                <button onclick="document.getElementById('admin-end-match-modal').style.display='none'" style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            
+            <p style="color: var(--muted-on-ink); margin-bottom: 1.5rem; font-size: 0.95rem;">
+                Please verify the final score before concluding this match. If this is a tournament match, the winner will advance automatically to the next round of the bracket.
+            </p>
+
+            <div style="display: flex; gap: 1.5rem; justify-content: center; align-items: center; margin-bottom: 1.5rem; background: rgba(255,255,255,0.05); padding: 1.25rem;">
+                <div style="text-align: center;">
+                    <div id="admin-modal-home-name" style="font-weight: 900; margin-bottom: 6px; font-size: 0.95rem;">Home</div>
+                    <input type="number" id="admin-modal-home-score" min="0" value="0" style="width: 70px; height: 50px; font-size: 1.75rem; text-align: center; background: #000; border: 2px solid var(--accent); color: var(--accent); font-weight: 900;">
+                </div>
+                <div style="font-size: 2rem; font-weight: 900; color: rgba(255,255,255,0.4);">&mdash;</div>
+                <div style="text-align: center;">
+                    <div id="admin-modal-away-name" style="font-weight: 900; margin-bottom: 6px; font-size: 0.95rem;">Away</div>
+                    <input type="number" id="admin-modal-away-score" min="0" value="0" style="width: 70px; height: 50px; font-size: 1.75rem; text-align: center; background: #000; border: 2px solid #fff; color: #fff; font-weight: 900;">
+                </div>
+            </div>
+
+            <div id="admin-modal-tie-wrapper" style="display: none; margin-bottom: 1.5rem; background: rgba(255,51,102,0.1); border: 1px solid var(--accent-red, #FF3366); padding: 1rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 800; color: var(--accent-red, #FF3366); margin-bottom: 6px;">
+                    MATCH IS TIED: SELECT WINNER TO ADVANCE IN BRACKET
+                </label>
+                <select id="admin-modal-winner-select" style="width: 100%; background: #000; color: #fff; border: 1px solid var(--accent); padding: 8px; font-weight: 700;">
+                    <option value="">-- Select Winner --</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="document.getElementById('admin-end-match-modal').style.display='none'">CANCEL</button>
+                <button id="admin-btn-confirm-end" class="btn btn-primary" style="background: var(--accent-red, #FF3366); color: #fff; font-weight: 900; border-color: var(--accent-red, #FF3366);">
+                    CONFIRM & END MATCH
+                </button>
+            </div>
+        </div>
+    </div>
+
     <footer class="footer">
         <div class="footer-links">
             <a href="#">SECURE LANE</a> / 
@@ -255,9 +392,9 @@
         </div>
     </footer>
 
-    <script src="js/config.js?v=1791809657"></script>
-    <script src="js/api.js?v=1791809657"></script>
-    <script src="js/ui.js?v=1791809657"></script>
-    <script src="js/admin.js?v=1791809657"></script>
+    <script src="js/config.js?v=1791810261"></script>
+    <script src="js/api.js?v=1791810261"></script>
+    <script src="js/ui.js?v=1791810261"></script>
+    <script src="js/admin.js?v=1791810261"></script>
 </body>
 </html>
