@@ -675,3 +675,76 @@
     font-size: 1rem !important;
   }
 }
+
+/* Hero Scoreboard Responsive */
+@media (max-width: 640px) {
+  .hero-scoreboard {
+    box-shadow: 8px 8px 0 var(--accent) !important;
+  }
+  .hsb-header {
+    padding: 0.75rem 1rem !important;
+    flex-wrap: wrap;
+    gap: 0.5rem !important;
+  }
+  .hsb-arena {
+    padding: 1.1rem 0.85rem !important;
+    gap: 0.5rem !important;
+  }
+  .hsb-crest {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 1.6rem !important;
+  }
+  .hsb-team-name {
+    font-size: 1.15rem !important;
+  }
+  .hsb-team-code {
+    font-size: 0.75rem !important;
+  }
+  .hsb-score-board {
+    padding: 0.3rem 0.7rem !important;
+  }
+  .hsb-score-num {
+    font-size: 2.25rem !important;
+    min-width: 28px !important;
+  }
+  .hsb-score-sep {
+    font-size: 1.5rem !important;
+  }
+  .hsb-footer {
+    padding: 0.75rem 1rem !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.65rem !important;
+  }
+  .hsb-venue {
+    justify-content: center !important;
+    font-size: 0.8rem !important;
+  }
+  .hsb-btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .hsb-arena {
+    padding: 1rem 0.4rem !important;
+    gap: 0.35rem !important;
+  }
+  .hsb-crest {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 1.3rem !important;
+  }
+  .hsb-team-name {
+    font-size: 0.95rem !important;
+  }
+  .hsb-score-num {
+    font-size: 1.85rem !important;
+    min-width: 22px !important;
+  }
+  .hsb-rail {
+    max-width: 80px !important;
+  }
+}

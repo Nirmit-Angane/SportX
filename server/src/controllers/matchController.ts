@@ -7,14 +7,16 @@ export const getAllMatches = async (req: Request, res: Response) => {
     const eventId = req.query.event_id;
     let queryStr = `
       SELECT m.*, 
-             t1.name as home_team_name, t1.logo as home_team_logo,
-             t2.name as away_team_name, t2.logo as away_team_logo,
+             t1.name as home_team_name, t1.short_name as home_team_short, t1.logo as home_team_logo,
+             t2.name as away_team_name, t2.short_name as away_team_short, t2.logo as away_team_logo,
              v.name as venue_name,
+             e.name as event_name,
              ms.home_score, ms.away_score, ms.timer
       FROM matches m
       LEFT JOIN teams t1 ON m.home_team_id = t1.id
       LEFT JOIN teams t2 ON m.away_team_id = t2.id
       LEFT JOIN venues v ON m.venue_id = v.id
+      LEFT JOIN events e ON m.event_id = e.id
       LEFT JOIN match_scores ms ON m.id = ms.match_id
     `;
     let result;
@@ -36,14 +38,16 @@ export const getMatchById = async (req: Request, res: Response) => {
     const { id } = req.params;
     const queryStr = `
       SELECT m.*, 
-             t1.name as home_team_name, t1.logo as home_team_logo,
-             t2.name as away_team_name, t2.logo as away_team_logo,
+             t1.name as home_team_name, t1.short_name as home_team_short, t1.logo as home_team_logo,
+             t2.name as away_team_name, t2.short_name as away_team_short, t2.logo as away_team_logo,
              v.name as venue_name,
+             e.name as event_name,
              ms.home_score, ms.away_score, ms.timer
       FROM matches m
       LEFT JOIN teams t1 ON m.home_team_id = t1.id
       LEFT JOIN teams t2 ON m.away_team_id = t2.id
       LEFT JOIN venues v ON m.venue_id = v.id
+      LEFT JOIN events e ON m.event_id = e.id
       LEFT JOIN match_scores ms ON m.id = ms.match_id
       WHERE m.id = $1
     `;

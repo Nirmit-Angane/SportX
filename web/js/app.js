@@ -94,20 +94,45 @@ async function loadHomepageData() {
     }
 }
 
+// Helper for Team Short Code & Initials
+function getTeamCode(teamName, shortName) {
+    if (shortName && shortName.trim().length > 0) return shortName.trim().toUpperCase();
+    if (!teamName) return 'TBA';
+    const words = teamName.trim().split(/\s+/);
+    if (words.length >= 2) {
+        return (words[0].substring(0, 2) + words[1].substring(0, 1)).toUpperCase();
+    }
+    return teamName.substring(0, 3).toUpperCase();
+}
+
+function getTeamInitial(teamName) {
+    if (!teamName) return '?';
+    const words = teamName.trim().split(/\s+/);
+    if (words.length >= 2) {
+        return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return teamName.substring(0, 2).toUpperCase();
+}
+
 function renderHeroLive(matches) {
     const heroEl = document.getElementById('hero-live-feature');
     if (!heroEl) return;
     
     const liveMatches = matches.filter(m => ['LIVE', 'TIMEOUT', 'UNDER REVIEW'].includes(m.status));
     const nextMatches = matches.filter(m => m.status === 'SCHEDULED');
+    const pastMatches = matches.filter(m => m.status === 'COMPLETED');
     
-    let match = liveMatches.length > 0 ? liveMatches[0] : (nextMatches.length > 0 ? nextMatches[0] : null);
+    let match = liveMatches.length > 0 ? liveMatches[0] : (nextMatches.length > 0 ? nextMatches[0] : (pastMatches.length > 0 ? pastMatches[pastMatches.length - 1] : null));
     
     // Ghost numeral update
     const ghost = document.getElementById('hero-ghost');
     if (ghost) {
-        if (liveMatches.length > 0 && match.timer) {
+        if (liveMatches.length > 0 && match && match.timer) {
             ghost.textContent = match.timer.substring(0, 2);
+        } else if (match && (match.home_score !== null || match.away_score !== null)) {
+            const h = match.home_score !== null ? match.home_score : 0;
+            const a = match.away_score !== null ? match.away_score : 0;
+            ghost.textContent = `${h}${a}`.slice(-2);
         } else {
             ghost.textContent = '00';
         }
@@ -115,73 +140,205 @@ function renderHeroLive(matches) {
     
     if (!match) {
         heroEl.innerHTML = `
-            <div class="hero-split-card" style="min-height: 250px;">
-                <div class="hero-split-left">
-                    <div class="hsc-status"><span class="tag"><span>NO MATCHES</span></span></div>
-                    <div class="hsc-title">OFF SEASON</div>
+            <div class="hero-scoreboard">
+                <div class="hsb-header">
+                    <div class="hsb-header-left">
+                        <div class="hsb-live-badge is-scheduled">
+                            <span>FIXTURES</span>
+                        </div>
+                        <div class="hsb-event-pill">
+                            <i data-lucide="calendar"></i>
+                            <span>OFF-SEASON</span>
+                        </div>
+                    </div>
+                    <div class="hsb-header-right">
+                        <span class="hsb-round-tag">NO LIVE ACTION</span>
+                    </div>
                 </div>
-                <div class="hero-split-right">
-                    <p style="font-weight: 700;">Check back later for upcoming fixtures.</p>
+                <div class="hsb-arena" style="grid-template-columns: 1fr; text-align: center; padding: 2.25rem 1.25rem;">
+                    <div style="font-family: var(--font-display); font-size: 2rem; font-style: italic; color: var(--white); text-transform: uppercase;">
+                        STADIUM STANDBY
+                    </div>
+                    <p style="color: var(--muted-on-ink); font-size: 0.95rem; margin-top: 0.4rem;">
+                        No live fixtures currently underway. Check the tournament schedule for upcoming matchdays.
+                    </p>
+                </div>
+                <div class="hsb-footer">
+                    <div class="hsb-venue">
+                        <i data-lucide="map-pin"></i>
+                        <span>SPORTX CENTRAL ARENA</span>
+                    </div>
+                    <a href="pages/matches.html" class="hsb-btn">
+                        <span>VIEW SCHEDULE</span>
+                        <i data-lucide="arrow-right" class="hsb-btn-arrow"></i>
+                    </a>
                 </div>
             </div>
         `;
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
         return;
     }
 
-    const isLive = liveMatches.length > 0;
-    const statusTag = isLive ? `<span class="tag" style="background: var(--accent); color: var(--ink);"><span><span class="live-dot" style="background: var(--ink); display: inline-block; width: 8px; height: 8px; margin-right: 4px;"></span>LIVE</span></span>` : `<span class="tag"><span>KICK-OFF ${match.match_time ? match.match_time.substring(0,5) : 'TBA'}</span></span>`;
+    const isLive = ['LIVE', 'TIMEOUT', 'UNDER REVIEW'].includes(match.status);
+    const isCompleted = match.status === 'COMPLETED';
+    const isScheduled = match.status === 'SCHEDULED';
     
-    // Calculate quarter for 4-segment bar (dummy logic based on timer if available, else 0)
-    let segments = 0;
-    if (isLive && match.timer) {
-        const mins = parseInt(match.timer.split(':')[0]) || 0;
-        if (mins > 0) segments = 1;
-        if (mins >= 22) segments = 2;
-        if (mins >= 45) segments = 3;
-        if (mins >= 67) segments = 4;
+    // Status Badge Logic
+    let statusBadgeClass = 'is-scheduled';
+    let statusBadgeHtml = '<span>UPCOMING</span>';
+    if (match.status === 'LIVE') {
+        statusBadgeClass = 'is-live';
+        statusBadgeHtml = `<span class="live-dot"></span><span>LIVE</span>`;
+    } else if (match.status === 'TIMEOUT') {
+        statusBadgeClass = 'is-timeout';
+        statusBadgeHtml = `<span class="live-dot" style="background:#000;"></span><span>TIMEOUT</span>`;
+    } else if (match.status === 'UNDER REVIEW') {
+        statusBadgeClass = 'is-review';
+        statusBadgeHtml = `<span class="live-dot" style="background:#000;"></span><span>VAR REVIEW</span>`;
+    } else if (isCompleted) {
+        statusBadgeClass = 'is-completed';
+        statusBadgeHtml = `<span>FINAL</span>`;
     }
 
-    let segmentBarHtml = isLive ? `
-        <div class="segment-bar" style="margin-top: 2rem;">
-            <div class="segment ${segments >= 1 ? 'filled' : ''}"></div>
-            <div class="segment ${segments >= 2 ? 'filled' : ''}"></div>
-            <div class="segment ${segments >= 3 ? 'filled' : ''}"></div>
-            <div class="segment ${segments >= 4 ? 'filled' : ''}"></div>
-        </div>
-    ` : '';
+    // Match Timeline / Quarters calculation
+    const timerStr = match.timer || '00:00';
+    const mins = parseInt(timerStr.split(':')[0]) || 0;
+    let segs = 0;
+    if (isLive) {
+        if (mins >= 1) segs = 1;
+        if (mins >= 23) segs = 2;
+        if (mins >= 46) segs = 3;
+        if (mins >= 68) segs = 4;
+    } else if (isCompleted) {
+        segs = 4;
+    }
+
+    // Period / Status label under score
+    let periodText = 'MATCHDAY';
+    if (match.status === 'TIMEOUT') periodText = 'TIMEOUT';
+    else if (match.status === 'UNDER REVIEW') periodText = 'VAR REVIEW';
+    else if (isCompleted) periodText = 'FULL TIME';
+    else if (isLive) periodText = mins <= 45 ? '1ST HALF' : '2ND HALF';
+    else if (match.match_time) periodText = `KICKOFF ${match.match_time.substring(0, 5)}`;
+
+    // Team metadata
+    const homePattern = getTeamPattern(match.home_team_name || 'Home');
+    const awayPattern = getTeamPattern(match.away_team_name || 'Away');
+    const homeInitial = getTeamInitial(match.home_team_name || 'Home');
+    const awayInitial = getTeamInitial(match.away_team_name || 'Away');
+    const homeCode = getTeamCode(match.home_team_name, match.home_team_short);
+    const awayCode = getTeamCode(match.away_team_name, match.away_team_short);
+    const eventName = match.event_name || 'SPORTX CHAMPIONSHIP';
+    const roundText = (match.round || 'ROUND OF 16').toUpperCase();
+    const venueName = match.venue_name || 'MAIN STADIUM';
+
+    const homeScore = match.home_score !== null ? match.home_score : 0;
+    const awayScore = match.away_score !== null ? match.away_score : 0;
+    const homeLead = (isLive || isCompleted) && homeScore > awayScore;
+    const awayLead = (isLive || isCompleted) && awayScore > homeScore;
+
+    // Center Clash Zone HTML
+    let clashCenterHtml = '';
+    if (isLive || isCompleted) {
+        clashCenterHtml = `
+            <div class="hsb-clash-center">
+                <div class="hsb-score-board">
+                    <span class="hsb-score-num ${homeLead ? 'is-leader' : ''}">${match.home_score !== null ? match.home_score : 0}</span>
+                    <span class="hsb-score-sep">:</span>
+                    <span class="hsb-score-num ${awayLead ? 'is-leader' : ''}">${match.away_score !== null ? match.away_score : 0}</span>
+                </div>
+                <div class="hsb-period-tag">${periodText}</div>
+                <div class="hsb-rail">
+                    <div class="hsb-rail-seg ${segs >= 1 ? 'active' : ''}"></div>
+                    <div class="hsb-rail-seg ${segs >= 2 ? 'active' : ''}"></div>
+                    <div class="hsb-rail-seg ${segs >= 3 ? 'active' : ''}"></div>
+                    <div class="hsb-rail-seg ${segs >= 4 ? 'active' : ''}"></div>
+                </div>
+            </div>
+        `;
+    } else {
+        clashCenterHtml = `
+            <div class="hsb-clash-center">
+                <div class="hsb-vs-badge">VS</div>
+                <div class="hsb-kickoff-time">${match.match_time ? match.match_time.substring(0, 5) : 'TBA'}</div>
+                <span class="hsb-kickoff-sub">${match.match_date ? match.match_date.substring(5, 10) : 'SCHEDULED'}</span>
+            </div>
+        `;
+    }
 
     heroEl.innerHTML = `
-        <div class="hero-split-card">
-            <div class="hero-split-left">
-                <div class="hsc-status">${statusTag}</div>
-                <div class="hsc-title">${match.round || 'MATCH'}</div>
-                ${segmentBarHtml}
+        <div class="hero-scoreboard">
+            <div class="hsb-header">
+                <div class="hsb-header-left">
+                    <div class="hsb-live-badge ${statusBadgeClass}">
+                        ${statusBadgeHtml}
+                    </div>
+                    <div class="hsb-event-pill" title="${eventName}">
+                        <i data-lucide="trophy"></i>
+                        <span>${eventName}</span>
+                    </div>
+                </div>
+                <div class="hsb-header-right">
+                    <span class="hsb-round-tag">${roundText}</span>
+                    ${isLive ? `
+                        <div class="hsb-clock-pill">
+                            <i data-lucide="clock"></i>
+                            <span class="hsb-clock-val">${timerStr}</span>
+                        </div>
+                    ` : ''}
+                </div>
             </div>
-            <div class="hero-split-right">
-                <div class="hsc-team-row">
-                    <div>${match.home_team_name}</div>
-                    <div class="hsc-score">${isLive && match.home_score !== null ? match.home_score : '-'}</div>
-                </div>
-                <div class="hsc-team-row">
-                    <div>${match.away_team_name}</div>
-                    <div class="hsc-score">${isLive && match.away_score !== null ? match.away_score : '-'}</div>
-                </div>
-                <div class="hsc-meta">
-                    <div class="hsc-meta-item">
-                        <span class="hsc-val">${isLive ? (match.timer || '00:00') : (match.match_date ? match.match_date.substring(5,10) : 'TBA')}</span>
-                        <span class="hsc-lbl">${isLive ? 'MINUTE' : 'DATE'}</span>
+
+            <div class="hsb-arena">
+                <div class="hsb-team hsb-team-home">
+                    <div class="hsb-crest-wrap">
+                        <div class="team-badge ${homePattern} hsb-crest">
+                            <div class="badge-pattern"></div>
+                            <span>${homeInitial}</span>
+                        </div>
                     </div>
-                    <div class="hsc-meta-item" style="text-align: right;">
-                        <span class="hsc-val" style="font-size: 1.25rem;">${match.venue_name || 'TBA'}</span>
-                        <span class="hsc-lbl">VENUE</span>
+                    <div class="hsb-team-info">
+                        <span class="hsb-team-role">HOME</span>
+                        <h4 class="hsb-team-name" title="${match.home_team_name || 'Home'}">${match.home_team_name || 'Home'}</h4>
+                        <span class="hsb-team-code">${homeCode}</span>
                     </div>
                 </div>
-                <div style="margin-top: 2rem;">
-                    <a href="pages/match.html?id=${match.id}" class="btn btn-secondary" style="width: 100%;">MATCH CENTER</a>
+
+                ${clashCenterHtml}
+
+                <div class="hsb-team hsb-team-away">
+                    <div class="hsb-crest-wrap">
+                        <div class="team-badge ${awayPattern} hsb-crest">
+                            <div class="badge-pattern"></div>
+                            <span>${awayInitial}</span>
+                        </div>
+                    </div>
+                    <div class="hsb-team-info">
+                        <span class="hsb-team-role">AWAY</span>
+                        <h4 class="hsb-team-name" title="${match.away_team_name || 'Away'}">${match.away_team_name || 'Away'}</h4>
+                        <span class="hsb-team-code">${awayCode}</span>
+                    </div>
                 </div>
+            </div>
+
+            <div class="hsb-footer">
+                <div class="hsb-venue">
+                    <i data-lucide="map-pin"></i>
+                    <span>${venueName}</span>
+                </div>
+                <a href="pages/match.html?id=${match.id}" class="hsb-btn">
+                    <span>MATCH CENTER</span>
+                    <i data-lucide="arrow-right" class="hsb-btn-arrow"></i>
+                </a>
             </div>
         </div>
     `;
+
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+    }
 }
 
 function renderLiveRail(matches) {
