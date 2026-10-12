@@ -17,6 +17,16 @@ try {
     memDb.public.none(schemaSql);
     memDb.public.none(seedSql);
     console.log("In-memory database initialized with schema and seed data!");
+
+    // Restore any custom generated brackets
+    const customBracketsPath = path.join(__dirname, '../../database/custom_brackets.sql');
+    if (fs.existsSync(customBracketsPath)) {
+        const customSql = fs.readFileSync(customBracketsPath, 'utf8');
+        if (customSql.trim()) {
+            memDb.public.none(customSql);
+            console.log("Restored custom brackets from persistent storage.");
+        }
+    }
 } catch (err: any) {
     console.error("Error initializing in-memory DB:", err.message);
 }

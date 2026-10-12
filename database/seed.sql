@@ -53,7 +53,15 @@ INSERT INTO matches (event_id, sport_id, home_team_id, away_team_id, venue_id, m
 (1, 1, 8, 4, 4, '2026-10-08', '16:00:00', 'Group Stage', 'SCHEDULED'),
 (1, 1, 5, 7, 1, '2026-10-09', '18:00:00', 'Group Stage', 'SCHEDULED'),
 (1, 1, 6, 8, 4, '2026-10-10', '16:00:00', 'Group Stage', 'SCHEDULED'),
-(1, 1, 1, 2, 1, '2026-10-15', '20:00:00', 'SEMIFINAL', 'LIVE'); -- The LIVE match
+(1, 1, 1, 2, 1, '2026-10-15', '20:00:00', 'SEMIFINAL', 'LIVE'), -- The LIVE match
+-- Official Tournament Bracket for Event 1 (National College Cup)
+(1, 1, 1, 2, 1, '2026-10-12', '14:00:00', 'Bracket: QF 1', 'COMPLETED'),
+(1, 1, 3, 4, 4, '2026-10-12', '16:30:00', 'Bracket: QF 2', 'COMPLETED'),
+(1, 1, 5, 6, 1, '2026-10-13', '14:00:00', 'Bracket: QF 3', 'COMPLETED'),
+(1, 1, 7, 8, 4, '2026-10-13', '16:30:00', 'Bracket: QF 4', 'COMPLETED'),
+(1, 1, 1, 3, 1, '2026-10-14', '17:00:00', 'Bracket: SF 1', 'SCHEDULED'),
+(1, 1, 5, 8, 1, '2026-10-14', '19:30:00', 'Bracket: SF 2', 'SCHEDULED'),
+(1, 1, NULL, NULL, 1, '2026-10-16', '20:00:00', 'Bracket: Final', 'SCHEDULED');
 
 -- Match Scores for Completed and Live Matches
 INSERT INTO match_scores (match_id, home_score, away_score, timer) VALUES 
@@ -61,7 +69,14 @@ INSERT INTO match_scores (match_id, home_score, away_score, timer) VALUES
 (2, 2, 2, '90:00'),
 (3, 0, 1, '90:00'),
 (4, 3, 1, '90:00'),
-(10, 2, 1, '67:23'); -- VIVA Warriors (1) 2 - 1 Mumbai Titans (2)
+(10, 2, 1, '67:23'), -- VIVA Warriors (1) 2 - 1 Mumbai Titans (2)
+(11, 2, 1, '90:00'), -- QF 1: VIVA Warriors 2 - 1 Mumbai Titans
+(12, 3, 1, '90:00'), -- QF 2: Pune Strikers 3 - 1 Delhi Dynamos
+(13, 2, 0, '90:00'), -- QF 3: Chennai Super Kings 2 - 0 Bengaluru FC
+(14, 1, 2, '90:00'), -- QF 4: Kerala Blasters 1 - 2 Goa FC
+(15, 0, 0, '00:00'), -- SF 1: VIVA Warriors vs Pune Strikers
+(16, 0, 0, '00:00'), -- SF 2: Chennai Super Kings vs Goa FC
+(17, 0, 0, '00:00'); -- Final: TBD vs TBD
 
 -- Update standings for completed matches (matches 1, 2, 3, 4)
 -- Match 1: 3(home) vs 4(away), 1-0 -> Team 3 wins, Team 4 loses

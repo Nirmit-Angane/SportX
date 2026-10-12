@@ -1,10 +1,12 @@
 import { Request, Response } from 'express';
+import fs from 'fs';
+import path from 'path';
 import { query } from '../db';
 import { sendSuccess, sendError } from '../utils/helpers';
 
 export const getAllMatches = async (req: Request, res: Response) => {
   try {
-    const eventId = req.query.event_id;
+    const eventId = req.query.event_id ? parseInt(req.query.event_id as string, 10) : undefined;
     let queryStr = `
       SELECT m.*, 
              t1.name as home_team_name, t1.short_name as home_team_short, t1.logo as home_team_logo,
@@ -175,8 +177,10 @@ export const endMatch = async (req: Request, res: Response) => {
 export const generateBracket = async (req: Request, res: Response) => {
   try {
     const { event_id } = req.body;
+    const eventId = parseInt(event_id, 10);
+    if (!eventId || isNaN(eventId)) return sendError(res, 'Valid event_id is required', 400);
     
-    let teamsRes = await query(`SELECT id FROM teams WHERE event_id = $1 LIMIT 8`, [event_id]);
+    let teamsRes = await query(`SELECT id FROM teams WHERE event_id = $1 LIMIT 8`, [eventId]);
     let teams = teamsRes.rows;
     if (teams.length < 8) {
       teamsRes = await query(`SELECT id FROM teams LIMIT 8`);
@@ -185,31 +189,46 @@ export const generateBracket = async (req: Request, res: Response) => {
     if (teams.length < 8) return sendError(res, 'Need at least 8 registered teams in the system to generate a QF bracket', 400);
 
     // Delete existing bracket for this event
-    await query(`DELETE FROM matches WHERE event_id = $1 AND round LIKE 'Bracket:%'`, [event_id]);
+    await query(`DELETE FROM matches WHERE event_id = $1 AND round LIKE 'Bracket:%'`, [eventId]);
+
+    let sqlPersist = `DELETE FROM matches WHERE event_id = ${eventId} AND round LIKE 'Bracket:%';\n`;
 
     const qfRounds = ['Bracket: QF 1', 'Bracket: QF 2', 'Bracket: QF 3', 'Bracket: QF 4'];
     for (let i = 0; i < 4; i++) {
         const m = await query(
             `INSERT INTO matches (event_id, round, status, home_team_id, away_team_id) VALUES ($1, $2, 'SCHEDULED', $3, $4) RETURNING id`,
-            [event_id, qfRounds[i], teams[i*2].id, teams[i*2+1].id]
+            [eventId, qfRounds[i], teams[i*2].id, teams[i*2+1].id]
         );
-        await query(`INSERT INTO match_scores (match_id) VALUES ($1)`, [m.rows[0].id]);
+        const matchId = m.rows[0].id;
+        await query(`INSERT INTO match_scores (match_id) VALUES ($1)`, [matchId]);
+        sqlPersist += `INSERT INTO matches (event_id, round, status, home_team_id, away_team_id) VALUES (${eventId}, '${qfRounds[i]}', 'SCHEDULED', ${teams[i*2].id}, ${teams[i*2+1].id});\n`;
     }
 
     const sfRounds = ['Bracket: SF 1', 'Bracket: SF 2'];
     for (let i = 0; i < 2; i++) {
         const m = await query(
             `INSERT INTO matches (event_id, round, status, home_team_id, away_team_id) VALUES ($1, $2, 'SCHEDULED', NULL, NULL) RETURNING id`,
-            [event_id, sfRounds[i]]
+            [eventId, sfRounds[i]]
         );
-        await query(`INSERT INTO match_scores (match_id) VALUES ($1)`, [m.rows[0].id]);
+        const matchId = m.rows[0].id;
+        await query(`INSERT INTO match_scores (match_id) VALUES ($1)`, [matchId]);
+        sqlPersist += `INSERT INTO matches (event_id, round, status, home_team_id, away_team_id) VALUES (${eventId}, '${sfRounds[i]}', 'SCHEDULED', NULL, NULL);\n`;
     }
 
     const m = await query(
         `INSERT INTO matches (event_id, round, status, home_team_id, away_team_id) VALUES ($1, 'Bracket: Final', 'SCHEDULED', NULL, NULL) RETURNING id`,
-        [event_id]
+        [eventId]
     );
-    await query(`INSERT INTO match_scores (match_id) VALUES ($1)`, [m.rows[0].id]);
+    const finalId = m.rows[0].id;
+    await query(`INSERT INTO match_scores (match_id) VALUES ($1)`, [finalId]);
+    sqlPersist += `INSERT INTO matches (event_id, round, status, home_team_id, away_team_id) VALUES (${eventId}, 'Bracket: Final', 'SCHEDULED', NULL, NULL);\n`;
+
+    try {
+        const customPath = path.join(__dirname, '../../../database/custom_brackets.sql');
+        fs.writeFileSync(customPath, sqlPersist, 'utf8');
+    } catch (saveErr) {
+        console.error('Could not persist custom_brackets.sql:', saveErr);
+    }
 
     sendSuccess(res, { generated: true });
   } catch (err: any) {

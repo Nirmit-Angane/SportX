@@ -152,9 +152,12 @@ async function logoutAdmin() {
 async function loadBrackets() {
     const res = await fetchAPI('/events');
     const select = document.getElementById('admin-bracket-event');
-    if (res.success && select) {
-        select.innerHTML = '<option value="">-- Select Event --</option>' + 
-            res.data.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+    if (res.success && select && res.data.length > 0) {
+        select.innerHTML = res.data.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+        if (!select.value || select.value === '') {
+            select.value = res.data[0].id;
+        }
+        loadAdminBracket(select.value);
     }
 }
 
@@ -165,9 +168,9 @@ async function loadAdminBracket(eventId) {
         return;
     }
     
-    const res = await fetchAPI('/matches');
+    const res = await fetchAPI('/matches?event_id=' + eventId);
     if (res.success) {
-        const matches = res.data.filter(m => m.event_id == eventId && m.round && m.round.startsWith('Bracket:'));
+        const matches = res.data.filter(m => m.round && m.round.startsWith('Bracket:'));
         
         if (matches.length > 0) {
             document.getElementById('admin-no-bracket').style.display = 'none';
@@ -182,9 +185,31 @@ async function loadAdminBracket(eventId) {
             const finalMatch = matches.find(m => m.round === 'Bracket: Final');
             
             const renderMatch = (m) => {
-                if (!m) return '<div>TBD vs TBD</div>';
-                return `<div style="font-weight: bold; color: var(--white);">${m.home_team_name || 'TBD'} vs ${m.away_team_name || 'TBD'}</div>
-                        <div style="font-size: 0.85rem; color: var(--accent); margin-top: 4px;">${m.status}</div>`;
+                if (!m) return `
+                    <div class="team"><span>TBD</span><span class="score">-</span></div>
+                    <div class="team"><span>TBD</span><span class="score">-</span></div>
+                `;
+                let hWin = false, aWin = false;
+                if (m.status === 'COMPLETED') {
+                    if (m.home_score > m.away_score) hWin = true;
+                    if (m.away_score > m.home_score) aWin = true;
+                }
+                const hScore = m.home_team_name ? (m.home_score !== null ? m.home_score : '-') : '-';
+                const aScore = m.away_team_name ? (m.away_score !== null ? m.away_score : '-') : '-';
+                return `
+                    <div class="team ${hWin ? 'winner' : ''}">
+                        <span>${m.home_team_name || 'TBD'}</span>
+                        <span class="score">${hScore}</span>
+                    </div>
+                    <div class="team ${aWin ? 'winner' : ''}">
+                        <span>${m.away_team_name || 'TBD'}</span>
+                        <span class="score">${aScore}</span>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--accent); margin-top: 6px; display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 4px;">
+                        <span>${m.status}</span>
+                        <a href="pages/match.html?id=${m.id}" target="_blank" style="color: var(--accent); text-decoration: underline;">Open</a>
+                    </div>
+                `;
             };
             
             document.getElementById('admin-qf1').innerHTML = renderMatch(qf1);

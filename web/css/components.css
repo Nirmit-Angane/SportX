@@ -340,16 +340,29 @@ tr.winner td:first-child {
   font-weight: 900;
 }
 
-.state-empty {
-  border: var(--border-xl) solid var(--ink);
-  background: var(--paper);
-  color: var(--ink);
-  padding: 4rem 2rem;
+.state-empty, .empty-state {
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  background: var(--ink-2);
+  color: var(--white);
+  padding: 3.5rem 2rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 8px 8px 0 var(--accent);
 }
-.state-empty h3 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
+.state-empty h3, .empty-state h3 {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 900;
+  font-size: 2.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--white);
+}
+.state-empty p, .empty-state p {
+  color: var(--muted-on-ink);
+  font-size: 1rem;
 }
 
 /* Skewed tags */

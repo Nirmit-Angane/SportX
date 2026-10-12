@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPORTX | Admin Dashboard</title>
-    <link rel="stylesheet" href="css/style.css?v=1791805711">
-    <link rel="stylesheet" href="css/components.css?v=1791805711">
-    <link rel="stylesheet" href="css/bracket.css?v=1791805711">
-    <link rel="stylesheet" href="css/responsive.css?v=1791805711">
+    <link rel="stylesheet" href="css/style.css?v=1791806722">
+    <link rel="stylesheet" href="css/components.css?v=1791806722">
+    <link rel="stylesheet" href="css/bracket.css?v=1791806722">
+    <link rel="stylesheet" href="css/responsive.css?v=1791806722">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         .section-view { display: none; }
@@ -60,16 +60,16 @@
         <!-- Dashboard View -->
         <div id="view-dashboard" class="section-view active">
             <div class="grid-3" style="margin-bottom: 2rem;">
-                <div class="card">
-                    <div class="section-label">Total Events</div>
+                <div class="card" style="background: var(--accent); border-color: var(--ink);">
+                    <div class="section-label" style="color: var(--ink); font-weight: 700;">Total Events</div>
                     <h2 style="font-size: 4rem; color: var(--ink);" id="stat-events">-</h2>
                 </div>
-                <div class="card">
-                    <div class="section-label">Active Teams</div>
+                <div class="card" style="background: var(--accent); border-color: var(--ink);">
+                    <div class="section-label" style="color: var(--ink); font-weight: 700;">Active Teams</div>
                     <h2 style="font-size: 4rem; color: var(--ink);" id="stat-teams">-</h2>
                 </div>
                 <div class="card" style="background: var(--accent); border-color: var(--ink);">
-                    <div class="section-label" style="color: var(--ink);">Live Matches</div>
+                    <div class="section-label" style="color: var(--ink); font-weight: 700;">Live Matches</div>
                     <h2 style="font-size: 4rem; color: var(--ink);" id="stat-live">-</h2>
                 </div>
             </div>
@@ -193,9 +193,9 @@
                 </div>
             </div>
             
-            <div id="admin-no-bracket" class="state-empty" style="display: none;">
-                <h3>NO BRACKET FOUND</h3>
-                <p>This event does not have a generated bracket yet.</p>
+            <div id="admin-no-bracket" class="state-empty" style="display: none; background: var(--ink-2); color: var(--white); border: 2px solid rgba(255,255,255,0.15); box-shadow: 6px 6px 0 var(--accent); padding: 3rem 2rem;">
+                <h3 style="color: var(--white); font-family: var(--font-display); font-size: 2.25rem;">NO BRACKET FOUND</h3>
+                <p style="color: var(--muted-on-ink);">This event does not have a generated bracket yet. Click "GENERATE QF BRACKET" above to create one.</p>
             </div>
         </div>
 
@@ -255,9 +255,9 @@
         </div>
     </footer>
 
-    <script src="js/config.js?v=1791805711"></script>
-    <script src="js/api.js?v=1791805711"></script>
-    <script src="js/ui.js?v=1791805711"></script>
-    <script src="js/admin.js?v=1791805711"></script>
+    <script src="js/config.js?v=1791806722"></script>
+    <script src="js/api.js?v=1791806722"></script>
+    <script src="js/ui.js?v=1791806722"></script>
+    <script src="js/admin.js?v=1791806722"></script>
 </body>
 </html>
