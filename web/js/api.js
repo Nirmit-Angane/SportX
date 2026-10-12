@@ -172,17 +172,51 @@ window.addEventListener('resize', () => {
     }
 });
 
+// Keep track of recent toasts to prevent identical duplicates from piling up
+const recentToastMessages = new Map();
+const handledStorageNotifyIds = new Set();
+
 /**
  * Global Cyber-Brutalist Live Notification System
  * Supports Start, Break, End, and Tournament Advancement notifications with cross-tab broadcast.
  */
-function showNotification(message, type = 'info', title = 'SPORTX LIVE') {
+function showNotification(message, type = 'info', title = 'SPORTX LIVE', broadcast = true) {
+    if (!message) return;
+
+    const trimmedMsg = String(message).trim();
+    const now = Date.now();
+
+    // 1. Debounce duplicate notifications within 2.5 seconds
+    const lastTime = recentToastMessages.get(trimmedMsg);
+    if (lastTime && (now - lastTime) < 2500) {
+        return; // Suppress duplicate notification
+    }
+    recentToastMessages.set(trimmedMsg, now);
+    if (recentToastMessages.size > 50) {
+        for (const [k, t] of recentToastMessages) {
+            if (now - t > 10000) recentToastMessages.delete(k);
+        }
+    }
+
     let container = document.getElementById('sportx-toast-container');
     if (!container) {
         container = document.createElement('div');
         container.id = 'sportx-toast-container';
         container.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999999; display: flex; flex-direction: column; gap: 12px; pointer-events: none; max-width: 540px; width: min(92vw, 540px); align-items: center;';
         document.body.appendChild(container);
+    } else {
+        // 2. Check if a toast with this exact text is already visibly active in the DOM
+        const activeToasts = container.querySelectorAll('.sportx-toast-text');
+        for (const tEl of activeToasts) {
+            if (tEl.textContent.trim() === trimmedMsg) {
+                return; // Already actively displayed in the container!
+            }
+        }
+    }
+
+    // Keep at most 2 toasts at a time on screen
+    while (container.children.length >= 2) {
+        container.firstElementChild.remove();
     }
 
     const toast = document.createElement('div');
@@ -191,7 +225,7 @@ function showNotification(message, type = 'info', title = 'SPORTX LIVE') {
         border: 2px solid var(--accent, #6EC6FF);
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 6px 6px 0 var(--accent, #6EC6FF);
         color: #fff;
-        padding: 1.1rem 1.35rem;
+        padding: 1rem 1.25rem;
         font-family: var(--font-display, inherit);
         pointer-events: auto;
         transform: translateY(-50px);
@@ -226,7 +260,7 @@ function showNotification(message, type = 'info', title = 'SPORTX LIVE') {
             </div>
             <button style="background: none; border: none; color: rgba(255,255,255,0.6); font-size: 1.4rem; cursor: pointer; line-height: 1; padding: 0 4px;" onclick="this.closest('#sportx-toast-container > div').remove()">&times;</button>
         </div>
-        <div style="font-weight: 700; font-size: 1rem; color: #fff; line-height: 1.4;">
+        <div class="sportx-toast-text" style="font-weight: 700; font-size: 1rem; color: #fff; line-height: 1.4;">
             ${message}
         </div>
     `;
@@ -238,28 +272,45 @@ function showNotification(message, type = 'info', title = 'SPORTX LIVE') {
         toast.style.opacity = '1';
     });
 
-    // Broadcast notification across browser tabs
-    try {
-        localStorage.setItem('sportx_latest_notify', JSON.stringify({ message, type, title: badgeTitle, time: Date.now() }));
-    } catch (e) {}
+    // 3. Broadcast notification across browser tabs ONLY IF broadcast is true
+    if (broadcast) {
+        const uniqueId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+        handledStorageNotifyIds.add(uniqueId);
+        try {
+            localStorage.setItem('sportx_latest_notify', JSON.stringify({
+                id: uniqueId,
+                message,
+                type,
+                title: badgeTitle,
+                time: Date.now()
+            }));
+        } catch (e) {}
+    }
 
-    // Auto dismiss after 6 seconds
+    // Auto dismiss after 5 seconds
     setTimeout(() => {
         toast.style.transform = 'translateY(-50px)';
         toast.style.opacity = '0';
         setTimeout(() => toast.remove(), 400);
-    }, 6000);
+    }, 5000);
 }
 
 window.showNotification = showNotification;
 
-// Listen for broadcast notifications across tabs
+// Listen for broadcast notifications across tabs (without echoing)
 window.addEventListener('storage', (e) => {
     if (e.key === 'sportx_latest_notify' && e.newValue) {
         try {
             const data = JSON.parse(e.newValue);
-            if (Date.now() - data.time < 5000) {
-                showNotification(data.message, data.type, data.title);
+            if (!data || !data.message) return;
+            if (data.id && handledStorageNotifyIds.has(data.id)) return;
+            if (data.id) {
+                handledStorageNotifyIds.add(data.id);
+                if (handledStorageNotifyIds.size > 50) handledStorageNotifyIds.clear();
+            }
+            if (Date.now() - (data.time || 0) < 4000) {
+                // Must pass broadcast = false to prevent echo loopback!
+                showNotification(data.message, data.type, data.title, false);
             }
         } catch (err) {}
     }

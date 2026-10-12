@@ -638,54 +638,70 @@ function setupAdminDeckListeners() {
 
 // Stepper helper for Admin Score controls
 function setupAdminScoreStepper(btnId, deltaH, deltaA, isGoal) {
-    const btn = document.getElementById(btnId);
-    if (!btn) return;
+    const oldBtn = document.getElementById(btnId);
+    if (!oldBtn) return;
+    
+    // Replace with clean node to remove any duplicate listeners
+    const btn = oldBtn.cloneNode(true);
+    oldBtn.parentNode.replaceChild(btn, oldBtn);
+
     btn.addEventListener('click', async () => {
         if (!currentAdminMatch) return alert("Select a match first.");
-        const homeScoreEl = document.getElementById('ctrl-home-score');
-        const awayScoreEl = document.getElementById('ctrl-away-score');
-        const timerEl = document.getElementById('ctrl-timer');
+        if (btn.dataset.processing === 'true') return;
+        btn.dataset.processing = 'true';
+        btn.disabled = true;
 
-        const oldH = Number(currentAdminMatch.home_score) || 0;
-        const oldA = Number(currentAdminMatch.away_score) || 0;
-        const newH = Math.max(0, oldH + deltaH);
-        const newA = Math.max(0, oldA + deltaA);
+        try {
+            const homeScoreEl = document.getElementById('ctrl-home-score');
+            const awayScoreEl = document.getElementById('ctrl-away-score');
+            const timerEl = document.getElementById('ctrl-timer');
 
-        const res = await fetchAPI(`/matches/${currentAdminMatch.id}/score`, {
-            method: 'PUT',
-            body: JSON.stringify({ home_score: newH, away_score: newA, timer: timerEl ? timerEl.innerText : '00:00' })
-        });
+            const oldH = Number(currentAdminMatch.home_score) || 0;
+            const oldA = Number(currentAdminMatch.away_score) || 0;
+            const newH = Math.max(0, oldH + deltaH);
+            const newA = Math.max(0, oldA + deltaA);
 
-        if (res.success) {
-            currentAdminMatch.home_score = newH;
-            currentAdminMatch.away_score = newA;
-            if (homeScoreEl) homeScoreEl.innerText = newH;
-            if (awayScoreEl) awayScoreEl.innerText = newA;
+            const res = await fetchAPI(`/matches/${currentAdminMatch.id}/score`, {
+                method: 'PUT',
+                body: JSON.stringify({ home_score: newH, away_score: newA, timer: timerEl ? timerEl.innerText : '00:00' })
+            });
 
-            if (isGoal) {
-                const scoringTeam = deltaH > 0 ? (currentAdminMatch.home_team_name || 'Home') : (currentAdminMatch.away_team_name || 'Away');
-                const scoringTeamId = deltaH > 0 ? currentAdminMatch.home_team_id : currentAdminMatch.away_team_id;
-                const min = `${Math.floor(adminTimerSeconds / 60)}'`;
+            if (res.success) {
+                currentAdminMatch.home_score = newH;
+                currentAdminMatch.away_score = newA;
+                if (homeScoreEl) homeScoreEl.innerText = newH;
+                if (awayScoreEl) awayScoreEl.innerText = newA;
 
-                if (typeof showNotification === 'function') {
-                    showNotification(`⚽ GOAL! ${scoringTeam} scores! Current: ${newH} - ${newA}`, 'live', 'GOAL SCORED');
+                if (isGoal) {
+                    const scoringTeam = deltaH > 0 ? (currentAdminMatch.home_team_name || 'Home') : (currentAdminMatch.away_team_name || 'Away');
+                    const scoringTeamId = deltaH > 0 ? currentAdminMatch.home_team_id : currentAdminMatch.away_team_id;
+                    const min = `${Math.floor(adminTimerSeconds / 60)}'`;
+
+                    if (typeof showNotification === 'function') {
+                        showNotification(`⚽ GOAL! ${scoringTeam} scores! Current: ${newH} - ${newA}`, 'live', 'GOAL SCORED');
+                    }
+
+                    // Log event to API
+                    await fetchAPI(`/matches/${currentAdminMatch.id}/events`, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            minute: min,
+                            type: 'GOAL',
+                            team_id: scoringTeamId,
+                            description: `Goal scored by ${scoringTeam} (${newH} - ${newA})`
+                        })
+                    });
+
+                    await loadAdminMatchEvents(currentAdminMatch.id);
                 }
-
-                // Log event to API
-                await fetchAPI(`/matches/${currentAdminMatch.id}/events`, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        minute: min,
-                        type: 'GOAL',
-                        team_id: scoringTeamId,
-                        description: `Goal scored by ${scoringTeam} (${newH} - ${newA})`
-                    })
-                });
-
-                await loadAdminMatchEvents(currentAdminMatch.id);
+            } else {
+                alert("Error updating score: " + (res.message || "Unknown error"));
             }
-        } else {
-            alert("Error updating score: " + (res.message || "Unknown error"));
+        } finally {
+            setTimeout(() => {
+                btn.dataset.processing = 'false';
+                btn.disabled = false;
+            }, 350);
         }
     });
 }
