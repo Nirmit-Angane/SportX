@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tournament Brackets | SPORTX</title>
-    <link rel="stylesheet" href="../css/style.css?v=1791806722">
-    <link rel="stylesheet" href="../css/components.css?v=1791806722">
-    <link rel="stylesheet" href="../css/bracket.css?v=1791806722">
-    <link rel="stylesheet" href="../css/responsive.css?v=1791806722">
+    <link rel="stylesheet" href="../css/style.css?v=1791808162">
+    <link rel="stylesheet" href="../css/components.css?v=1791808162">
+    <link rel="stylesheet" href="../css/bracket.css?v=1791808162">
+    <link rel="stylesheet" href="../css/responsive.css?v=1791808162">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
@@ -44,7 +44,7 @@
             <div class="bracket-scroll-hint">
                 <i data-lucide="move-horizontal"></i> <span>Swipe horizontally to view full bracket</span>
             </div>
-            <div class="bracket-container" id="bracket-container" style="gap: 50px;">
+            <div class="bracket-container" id="bracket-container">
                 <!-- Quarter Finals -->
                 <div class="bracket-round">
                     <div class="bracket-title">QUARTER-FINALS</div>
@@ -57,14 +57,14 @@
                 <!-- Semi Finals -->
                 <div class="bracket-round" style="justify-content: space-around;">
                     <div class="bracket-title">SEMI-FINALS</div>
-                    <div class="bracket-match" id="sf1" style="margin-bottom: 4rem;"></div>
+                    <div class="bracket-match" id="sf1"></div>
                     <div class="bracket-match" id="sf2"></div>
                 </div>
 
                 <!-- Final -->
                 <div class="bracket-round" style="justify-content: center;">
                     <div class="bracket-title">CHAMPIONSHIP</div>
-                    <div class="bracket-match" id="final" style="border: 4px solid var(--accent);"></div>
+                    <div class="bracket-match" id="final"></div>
                 </div>
             </div>
         </div>
@@ -76,8 +76,8 @@
         </div>
     </div>
 
-    <script src="../js/config.js?v=1791806722"></script>
-    <script src="../js/api.js?v=1791806722"></script>
+    <script src="../js/config.js?v=1791808162"></script>
+    <script src="../js/api.js?v=1791808162"></script>
     <script>
         lucide.createIcons();
 
@@ -117,6 +117,17 @@
                     renderMatch(bracketMatches.find(m => m.round === 'Bracket: SF 1'), 'sf1');
                     renderMatch(bracketMatches.find(m => m.round === 'Bracket: SF 2'), 'sf2');
                     renderMatch(bracketMatches.find(m => m.round === 'Bracket: Final'), 'final');
+
+                    requestAnimationFrame(() => {
+                        if (typeof drawBracketTree === 'function') {
+                            drawBracketTree('bracket-container', '');
+                        }
+                    });
+                    setTimeout(() => {
+                        if (typeof drawBracketTree === 'function') {
+                            drawBracketTree('bracket-container', '');
+                        }
+                    }, 100);
                 }
             }
         }
@@ -146,6 +157,6 @@
             `;
         }
     </script>
-<script src="../js/ui.js?v=1791806722"></script>
+<script src="../js/ui.js?v=1791808162"></script>
 </body>
 </html>

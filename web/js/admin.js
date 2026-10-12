@@ -51,7 +51,14 @@ function switchAdminTab(tabId) {
     else if (tabId === 'matches') loadMatches();
     else if (tabId === 'events') loadEvents();
     else if (tabId === 'teams') loadTeams();
-    else if (tabId === 'brackets') loadBrackets();
+    else if (tabId === 'brackets') {
+        loadBrackets();
+        setTimeout(() => {
+            if (typeof drawBracketTree === 'function') {
+                drawBracketTree('admin-bracket-container', 'admin-');
+            }
+        }, 150);
+    }
     else if (tabId === 'live-score') loadLiveScoreTab();
 }
 
@@ -219,6 +226,17 @@ async function loadAdminBracket(eventId) {
             document.getElementById('admin-sf1').innerHTML = renderMatch(sf1);
             document.getElementById('admin-sf2').innerHTML = renderMatch(sf2);
             document.getElementById('admin-final').innerHTML = renderMatch(finalMatch);
+
+            requestAnimationFrame(() => {
+                if (typeof drawBracketTree === 'function') {
+                    drawBracketTree('admin-bracket-container', 'admin-');
+                }
+            });
+            setTimeout(() => {
+                if (typeof drawBracketTree === 'function') {
+                    drawBracketTree('admin-bracket-container', 'admin-');
+                }
+            }, 100);
             
         } else {
             document.getElementById('admin-bracket-view').style.display = 'none';
