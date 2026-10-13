@@ -1,39 +1,21 @@
-import { newDb } from 'pg-mem';
-import fs from 'fs';
+import { Pool } from 'pg';
 import path from 'path';
 import dotenv from 'dotenv';
 
+// Load .env
+dotenv.config({ path: path.join(__dirname, '../.env') });
+dotenv.config({ path: path.join(__dirname, '../../server/.env') });
 dotenv.config();
 
-// Create an in-memory database
-const memDb = newDb();
+const DEFAULT_DATABASE_URL = 'postgresql://sportx_jg4g_user:qL7le915KtvQ8N6xNnmKGoRongaCVKdj@dpg-danr8m142hec73feuvcg-a.oregon-postgres.render.com/sportx_jg4g';
+const connectionString = process.env.DATABASE_URL || DEFAULT_DATABASE_URL;
 
-// Read schema and seed files
-const schemaSql = fs.readFileSync(path.join(__dirname, '../../database/schema.sql'), 'utf8');
-const seedSql = fs.readFileSync(path.join(__dirname, '../../database/seed.sql'), 'utf8');
+const isRemote = Boolean(connectionString && !connectionString.includes('localhost') && !connectionString.includes('127.0.0.1'));
 
-try {
-    // Run schema and seed
-    memDb.public.none(schemaSql);
-    memDb.public.none(seedSql);
-    console.log("In-memory database initialized with schema and seed data!");
+export const pool = new Pool({
+  connectionString,
+  ssl: isRemote ? { rejectUnauthorized: false } : undefined
+});
 
-    // Restore any custom generated brackets
-    const customBracketsPath = path.join(__dirname, '../../database/custom_brackets.sql');
-    if (fs.existsSync(customBracketsPath)) {
-        const customSql = fs.readFileSync(customBracketsPath, 'utf8');
-        if (customSql.trim()) {
-            memDb.public.none(customSql);
-            console.log("Restored custom brackets from persistent storage.");
-        }
-    }
-} catch (err: any) {
-    console.error("Error initializing in-memory DB:", err.message);
-}
-
-// Export a connection pool emulator compatible with 'pg'
-const { Pool } = memDb.adapters.createPg();
-export const pool = new Pool();
-
-// Export the query helper
 export const query = (text: string, params?: any[]) => pool.query(text, params);
+

@@ -20,10 +20,11 @@ export const getAllTeams = async (req: Request, res: Response) => {
 export const createTeam = async (req: Request, res: Response) => {
   try {
     const { name, short_name, captain, coach, logo, event_id } = req.body;
+    const parsedEventId = event_id ? parseInt(event_id, 10) : null;
     const result = await query(
       `INSERT INTO teams (name, short_name, captain, coach, logo, event_id) 
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [name, short_name, captain, coach, logo, event_id]
+      [name, short_name, captain, coach, logo, parsedEventId]
     );
     sendSuccess(res, result.rows[0]);
   } catch (err: any) {
@@ -35,6 +36,7 @@ export const updateTeam = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { name, short_name, captain, coach, logo, event_id } = req.body;
+    const parsedEventId = event_id !== undefined ? (event_id ? parseInt(event_id, 10) : null) : undefined;
     const result = await query(
       `UPDATE teams SET 
        name = COALESCE($1, name), 
@@ -44,7 +46,7 @@ export const updateTeam = async (req: Request, res: Response) => {
        logo = COALESCE($5, logo), 
        event_id = COALESCE($6, event_id)
        WHERE id = $7 RETURNING *`,
-      [name, short_name, captain, coach, logo, event_id, id]
+      [name, short_name, captain, coach, logo, parsedEventId, id]
     );
     if (result.rows.length === 0) return sendError(res, 'Team not found', 404);
     sendSuccess(res, result.rows[0]);

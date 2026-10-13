@@ -24,8 +24,9 @@ app.use('/api', routes);
 
 // Database connection test
 pool.connect()
-  .then(() => {
+  .then((client) => {
     console.log('Connected to PostgreSQL database');
+    client.release();
   })
   .catch((err: any) => {
     console.error('Database connection error:', err.message);

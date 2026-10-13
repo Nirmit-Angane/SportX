@@ -60,6 +60,23 @@ The admin dashboard is an integrated secure portal.
    - Username: `admin` 
    - Password: `admin123` 
 
+### 5. Inspect / View Database in Terminal
+SportX includes a built-in terminal tool to inspect tables and run queries directly in your terminal without requiring `psql` to be installed:
+
+```bash
+# View all tables and row counts
+node server/query.js
+
+# View data from a specific table (e.g. teams, matches, sports, events, players)
+node server/query.js teams
+node server/query.js matches
+
+# Run a custom SQL query directly
+node server/query.js "SELECT id, name, captain, coach FROM teams LIMIT 5"
+```
+
+> **Tip:** If you are inside the `server/` directory, you can also use `npm run db:view` or `node query.js <table_name>`.
+
 ---
 
 ## 📱 Core Features
